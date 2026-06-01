@@ -1,0 +1,106 @@
+// Alphabet learning view
+const AlphabetView = {
+  render(container) {
+    container.innerHTML = "";
+
+    const header = document.createElement("div");
+    header.className = "view-header";
+    header.innerHTML = `
+      <h2>The Gujarati Alphabet</h2>
+      <p>Tap any letter to hear its sound. Master vowels first, then consonants, then learn how matras combine them.</p>
+    `;
+    container.appendChild(header);
+
+    AlphabetView.renderSection(container, "Vowels (સ્વર)", ALPHABET.vowels, "vowels");
+    AlphabetView.renderSection(container, "Consonants (વ્યંજન)", ALPHABET.consonants, "consonants");
+    AlphabetView.renderMatras(container);
+    AlphabetView.renderNumbers(container);
+  },
+
+  renderSection(container, title, items, key) {
+    const heading = document.createElement("h3");
+    heading.className = "section-title";
+    heading.textContent = title;
+    container.appendChild(heading);
+
+    const grid = document.createElement("div");
+    grid.className = "grid letters";
+
+    for (const item of items) {
+      const card = document.createElement("div");
+      card.className = "letter-card";
+      card.innerHTML = `
+        <div class="gu-big">${item.char}</div>
+        <div class="translit">${item.translit}</div>
+        <div class="sound">${item.sound}</div>
+      `;
+      card.addEventListener("click", () => {
+        Audio.speak(item.char);
+        AlphabetView.markLearned(item.char);
+      });
+      grid.appendChild(card);
+    }
+    container.appendChild(grid);
+  },
+
+  renderMatras(container) {
+    const heading = document.createElement("h3");
+    heading.className = "section-title";
+    heading.textContent = "Matras (vowel signs) — shown on ક";
+    container.appendChild(heading);
+
+    const explanation = document.createElement("p");
+    explanation.style.color = "var(--ink-muted)";
+    explanation.style.fontSize = "14px";
+    explanation.style.margin = "0 0 14px";
+    explanation.textContent = "When a consonant pairs with a vowel other than the inherent 'a', a matra sign attaches to it. These are the building blocks of every syllable.";
+    container.appendChild(explanation);
+
+    const grid = document.createElement("div");
+    grid.className = "grid letters";
+
+    for (const m of ALPHABET.matras) {
+      const card = document.createElement("div");
+      card.className = "letter-card";
+      card.innerHTML = `
+        <div class="gu-big">${m.example}</div>
+        <div class="translit">${m.translit}</div>
+        <div class="sound">${m.note}</div>
+      `;
+      card.addEventListener("click", () => Audio.speak(m.example));
+      grid.appendChild(card);
+    }
+    container.appendChild(grid);
+  },
+
+  renderNumbers(container) {
+    const heading = document.createElement("h3");
+    heading.className = "section-title";
+    heading.textContent = "Numbers 0–10";
+    container.appendChild(heading);
+
+    const grid = document.createElement("div");
+    grid.className = "grid letters";
+    for (const n of ALPHABET.numbers) {
+      const card = document.createElement("div");
+      card.className = "letter-card";
+      card.innerHTML = `
+        <div class="gu-big">${n.char}</div>
+        <div class="translit">${n.translit}</div>
+        <div class="sound">${n.en}</div>
+      `;
+      card.addEventListener("click", () => Audio.speak(n.translit));
+      grid.appendChild(card);
+    }
+    container.appendChild(grid);
+  },
+
+  markLearned(char) {
+    const state = Storage.load();
+    if (!state.lettersLearned.includes(char)) {
+      state.lettersLearned.push(char);
+      Storage.save(state);
+    }
+    Storage.markStudiedToday();
+  },
+};

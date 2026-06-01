@@ -1,0 +1,50 @@
+// App router & init
+const VIEWS = {
+  home: HomeView,
+  alphabet: AlphabetView,
+  flashcards: FlashcardsView,
+  grammar: GrammarView,
+  conversation: ConversationView,
+  settings: SettingsView,
+};
+
+let currentView = "home";
+
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.classList.toggle("active", tab.dataset.view === view);
+  });
+  const main = document.getElementById("main");
+  VIEWS[view].render(main);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateStreakBadge() {
+  const state = Storage.load();
+  const el = document.getElementById("streak-count");
+  if (el) el.textContent = state.streak;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Init audio
+  Audio.init();
+
+  // Hook up tabs
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => switchView(tab.dataset.view));
+  });
+
+  // Streak display
+  updateStreakBadge();
+
+  // Initial view
+  switchView("home");
+
+  // Refresh streak whenever localStorage changes (e.g. after study actions)
+  const origSave = Storage.save;
+  Storage.save = function (s) {
+    origSave(s);
+    updateStreakBadge();
+  };
+});

@@ -1,0 +1,87 @@
+// Settings view
+const SettingsView = {
+  render(container) {
+    container.innerHTML = "";
+
+    const header = document.createElement("div");
+    header.className = "view-header";
+    header.innerHTML = `<h2>Settings</h2><p>Configure your study experience.</p>`;
+    container.appendChild(header);
+
+    const state = Storage.load();
+
+    // ---- Pronunciation ----
+    const audioSec = document.createElement("div");
+    audioSec.className = "settings-section";
+    audioSec.innerHTML = `
+      <h3>Pronunciation</h3>
+      <p>${Audio.voiceLabel()}</p>
+      <div class="setting-row">
+        <label>Test the voice</label>
+        <button class="btn" id="test-voice">🔊 Play "નમસ્તે"</button>
+      </div>
+      <div class="setting-row">
+        <label>Note</label>
+        <span style="font-size: 13px; color: var(--ink-muted); max-width: 60%; text-align: right;">
+          Browser speech-synthesis voices vary by OS. On macOS, install a Gujarati or Hindi voice via System Settings → Accessibility → Spoken Content → System voice → Manage Voices.
+        </span>
+      </div>
+    `;
+    container.appendChild(audioSec);
+    audioSec.querySelector("#test-voice").addEventListener("click", () => Audio.speak("નમસ્તે"));
+
+    // ---- API key ----
+    const apiSec = document.createElement("div");
+    apiSec.className = "settings-section";
+    apiSec.innerHTML = `
+      <h3>AI Tutor (Anthropic API)</h3>
+      <p>Add your API key to enable the live Claude tutor in Conversation Practice. Stored only in your browser's localStorage — never sent anywhere except api.anthropic.com.</p>
+      <div class="setting-row">
+        <label for="api-key">API key</label>
+        <input type="password" id="api-key" placeholder="sk-ant-..." value="${state.apiKey || ""}" />
+      </div>
+      <div class="setting-row">
+        <span></span>
+        <button class="btn btn-primary" id="save-api">Save</button>
+      </div>
+    `;
+    container.appendChild(apiSec);
+    apiSec.querySelector("#save-api").addEventListener("click", () => {
+      const v = apiSec.querySelector("#api-key").value.trim();
+      const s = Storage.load();
+      s.apiKey = v;
+      Storage.save(s);
+      toast(v ? "API key saved." : "API key cleared.");
+    });
+
+    // ---- Reset ----
+    const resetSec = document.createElement("div");
+    resetSec.className = "settings-section";
+    resetSec.innerHTML = `
+      <h3>Reset progress</h3>
+      <p>Erase all your stats, SRS data, and settings. This cannot be undone.</p>
+      <div class="setting-row">
+        <span></span>
+        <button class="btn" id="reset-btn" style="color: var(--bad); border-color: var(--bad);">Reset everything</button>
+      </div>
+    `;
+    container.appendChild(resetSec);
+    resetSec.querySelector("#reset-btn").addEventListener("click", () => {
+      if (confirm("Erase all progress? This cannot be undone.")) {
+        Storage.reset();
+        toast("All progress cleared.");
+        setTimeout(() => location.reload(), 600);
+      }
+    });
+
+    // ---- About ----
+    const aboutSec = document.createElement("div");
+    aboutSec.className = "settings-section";
+    aboutSec.innerHTML = `
+      <h3>About Shīkho</h3>
+      <p>A self-contained Gujarati learning app — no servers, no accounts. All progress lives in your browser.</p>
+      <p style="font-size:13px;color:var(--ink-muted);margin-top:8px;">v0.1 · Built for Harsh</p>
+    `;
+    container.appendChild(aboutSec);
+  },
+};

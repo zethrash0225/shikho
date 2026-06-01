@@ -1,0 +1,1387 @@
+// Duolingo-style curriculum.
+//
+// Hierarchy: UNITS → lessons → exercises.
+// CEFR mapping: A1 (units 1-4), A2 (units 5-7), B1 (units 8-9), B1/B2 (unit 10).
+//
+// Exercise types (handled by lesson-player.js):
+//   mcGu  — show Gujarati, pick English meaning from 4 choices
+//   mcEn  — show English, pick Gujarati word from 4 choices
+//   listen — 🔊 play Gujarati audio, pick matching Gujarati script from 4 choices
+//   tap   — translate English → Gujarati by tapping word tiles in order
+//   type  — translate English → Gujarati by typing (on-screen keyboard)
+//   match — match 4-5 Gujarati words with their English meanings
+//   fill  — fill the blank in a Gujarati sentence
+
+// ---- Exercise builder helpers ----
+function mcGu(gu, en, choices) {
+  return { type: "mcGu", gu, en, choices: shuffleInPlace([en, ...choices.filter(c => c !== en)]).slice(0, 4) };
+}
+function mcEn(en, gu, distractors) {
+  return { type: "mcEn", en, gu, choices: shuffleInPlace([gu, ...distractors]).slice(0, 4) };
+}
+function listen(gu, en, distractors) {
+  return { type: "listen", gu, en, choices: shuffleInPlace([gu, ...distractors]).slice(0, 4) };
+}
+function tap(en, guTokens, distractors = []) {
+  return { type: "tap", en, gu: guTokens.join(" "), tokens: guTokens, bank: shuffleInPlace([...guTokens, ...distractors]) };
+}
+function typeIt(en, expected, accept = []) {
+  return { type: "type", en, expected, accept: [expected, ...accept] };
+}
+function match(pairs) {
+  return { type: "match", pairs };
+}
+function fill(template, correct, distractors, en) {
+  return { type: "fill", template, correct, choices: shuffleInPlace([correct, ...distractors]).slice(0, 4), en };
+}
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ===== UNITS =====
+
+const UNITS = [
+
+  // ============ UNIT 1: BASICS 1 ============
+  {
+    id: "u1", cefr: "A1", title: "Basics 1", icon: "👋", color: "#e07a3c",
+    description: "Greetings, yes/no, thank you",
+    lessons: [
+      {
+        id: "u1l1", title: "Saying hello",
+        exercises: [
+          mcGu("નમસ્તે", "hello", ["goodbye", "thanks", "please"]),
+          mcEn("hello", "નમસ્તે", ["આવજો", "આભાર", "હા"]),
+          listen("આભાર", "thank you", ["નમસ્તે", "હા", "ના"]),
+          mcGu("આવજો", "goodbye", ["hello", "yes", "no"]),
+          mcEn("thank you", "આભાર", ["નમસ્તે", "આવજો", "માફ કરો"]),
+          mcGu("હા", "yes", ["no", "hello", "please"]),
+          mcGu("ના", "no", ["yes", "hello", "thanks"]),
+          mcEn("sorry / excuse me", "માફ કરો", ["આભાર", "નમસ્તે", "આવજો"]),
+          match([
+            { gu: "નમસ્તે", en: "hello" },
+            { gu: "આવજો",   en: "goodbye" },
+            { gu: "આભાર",   en: "thank you" },
+            { gu: "હા",     en: "yes" },
+            { gu: "ના",     en: "no" },
+          ]),
+          listen("નમસ્તે", "hello", ["આવજો", "આભાર", "માફ કરો"]),
+        ],
+      },
+      {
+        id: "u1l2", title: "How are you?",
+        exercises: [
+          mcGu("કેમ છો?", "how are you?", ["what is this?", "where are you?", "who are you?"]),
+          mcEn("I am well", "મજામાં", ["કેમ છો", "આભાર", "ખુશ"]),
+          listen("કેમ છો?", "how are you?", ["શું છે?", "ક્યાં છો?", "કોણ છો?"]),
+          tap("How are you?", ["કેમ", "છો?"], ["શું", "છો", "ક્યાં"]),
+          tap("I am well, thanks.", ["મજામાં,", "આભાર."], ["કેમ", "છો", "નમસ્તે"]),
+          mcGu("શુભ સવાર", "good morning", ["good night", "good afternoon", "goodbye"]),
+          mcGu("શુભ રાત્રિ", "good night", ["good morning", "good afternoon", "hello"]),
+          fill("__ છો?", "કેમ", ["શું", "ક્યાં", "કોણ"], "How are you?"),
+          typeIt("Hello, how are you?", "નમસ્તે, કેમ છો?", ["નમસ્તે કેમ છો?", "નમસ્તે, કેમ છો"]),
+          match([
+            { gu: "શુભ સવાર",   en: "good morning" },
+            { gu: "શુભ રાત્રિ", en: "good night" },
+            { gu: "મજામાં",     en: "I am well" },
+            { gu: "આભાર",       en: "thanks" },
+          ]),
+        ],
+      },
+      {
+        id: "u1l3", title: "Names & introductions",
+        exercises: [
+          mcGu("મારું નામ", "my name", ["your name", "his name", "their name"]),
+          mcEn("your name (polite)", "તમારું નામ", ["મારું નામ", "તારું નામ", "તેનું નામ"]),
+          mcGu("તમારું નામ શું છે?", "what is your name?", ["where are you from?", "how are you?", "who is this?"]),
+          listen("મારું નામ રામ છે.", "My name is Ram.", ["તારું નામ શું છે?", "તે કોણ છે?", "નમસ્તે, કેમ છો?"]),
+          tap("My name is Anjali.", ["મારું", "નામ", "અંજલિ", "છે."], ["તમારું", "તે", "શું"]),
+          typeIt("What is your name?", "તમારું નામ શું છે?", ["તારું નામ શું છે?"]),
+          mcGu("મળીને આનંદ થયો", "pleased to meet you", ["see you later", "good morning", "thank you"]),
+          fill("મારું __ રામ છે.", "નામ", ["નામે", "નામો", "નામની"], "My name is Ram."),
+          match([
+            { gu: "નામ", en: "name" },
+            { gu: "મારું", en: "my" },
+            { gu: "તમારું", en: "your (polite)" },
+            { gu: "છે", en: "is" },
+            { gu: "શું", en: "what" },
+          ]),
+          tap("Nice to meet you.", ["મળીને", "આનંદ", "થયો."], ["નામ", "છે", "મારું"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 2: PEOPLE ============
+  {
+    id: "u2", cefr: "A1", title: "People", icon: "👤", color: "#3c7ae0",
+    description: "Pronouns, 'to be', numbers 1-10",
+    lessons: [
+      {
+        id: "u2l1", title: "Pronouns",
+        exercises: [
+          mcGu("હું", "I", ["you", "he/she", "we"]),
+          mcGu("તું", "you (informal)", ["I", "he", "they"]),
+          mcGu("તમે", "you (polite/plural)", ["I", "he", "we"]),
+          mcGu("તે", "he / she / it", ["I", "you", "we"]),
+          mcGu("અમે", "we (excl.)", ["I", "you", "they"]),
+          mcGu("આપણે", "we (incl.)", ["I", "he", "they"]),
+          mcGu("તેઓ", "they", ["I", "we", "you"]),
+          mcEn("I", "હું", ["તું", "તે", "અમે"]),
+          mcEn("you (polite)", "તમે", ["તું", "તે", "આપણે"]),
+          match([
+            { gu: "હું",     en: "I" },
+            { gu: "તું",     en: "you (informal)" },
+            { gu: "તમે",     en: "you (polite)" },
+            { gu: "તે",      en: "he/she" },
+            { gu: "અમે",     en: "we" },
+            { gu: "તેઓ",     en: "they" },
+          ]),
+        ],
+      },
+      {
+        id: "u2l2", title: "To be (છે)",
+        exercises: [
+          mcGu("હું ખુશ છું.", "I am happy.", ["You are happy.", "We are happy.", "He is happy."]),
+          mcGu("તું વિદ્યાર્થી છે.", "You are a student.", ["I am a student.", "He is a student.", "They are students."]),
+          mcGu("તે ડૉક્ટર છે.", "He/she is a doctor.", ["I am a doctor.", "We are doctors.", "You are a doctor."]),
+          mcGu("અમે ભારતીય છીએ.", "We are Indian.", ["I am Indian.", "They are Indian.", "You are Indian."]),
+          fill("હું ખુશ __.", "છું", ["છે", "છો", "છીએ"], "I am happy."),
+          fill("તમે ક્યાં __?", "છો", ["છું", "છે", "છીએ"], "Where are you (polite)?"),
+          fill("તે ઘરે __.", "છે", ["છું", "છો", "છીએ"], "He/she is at home."),
+          tap("I am a student.", ["હું", "વિદ્યાર્થી", "છું."], ["છો", "છે", "ખુશ"]),
+          tap("We are happy.", ["અમે", "ખુશ", "છીએ."], ["છો", "છું", "છે"]),
+          typeIt("I am happy.", "હું ખુશ છું.", ["હું ખુશ છું"]),
+          mcGu("તેઓ ઘરે છે.", "They are at home.", ["I am at home.", "You are at home.", "He is at home."]),
+        ],
+      },
+      {
+        id: "u2l3", title: "Numbers 1 to 10",
+        exercises: [
+          mcGu("એક", "one", ["two", "three", "four"]),
+          mcGu("બે", "two", ["one", "three", "five"]),
+          mcGu("ત્રણ", "three", ["two", "four", "six"]),
+          mcGu("ચાર", "four", ["three", "five", "two"]),
+          mcGu("પાંચ", "five", ["four", "six", "ten"]),
+          mcGu("છ", "six", ["five", "seven", "four"]),
+          mcGu("સાત", "seven", ["six", "eight", "five"]),
+          mcGu("આઠ", "eight", ["seven", "nine", "six"]),
+          mcGu("નવ", "nine", ["eight", "ten", "seven"]),
+          mcGu("દસ", "ten", ["nine", "eight", "seven"]),
+          listen("પાંચ", "five", ["છ", "ચાર", "દસ"]),
+          listen("આઠ", "eight", ["નવ", "સાત", "દસ"]),
+          match([
+            { gu: "એક", en: "1" },{ gu: "બે", en: "2" },{ gu: "ત્રણ", en: "3" },
+            { gu: "ચાર", en: "4" },{ gu: "પાંચ", en: "5" },{ gu: "દસ", en: "10" },
+          ]),
+          tap("I have three children.", ["મારે", "ત્રણ", "બાળકો", "છે."], ["એક", "મારા"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 3: FAMILY ============
+  {
+    id: "u3", cefr: "A1", title: "Family", icon: "👨‍👩‍👧", color: "#e0accc",
+    description: "Family members, possessives",
+    lessons: [
+      {
+        id: "u3l1", title: "Family members",
+        exercises: [
+          mcGu("માતા", "mother", ["father", "sister", "brother"]),
+          mcGu("પિતા", "father", ["mother", "uncle", "son"]),
+          mcGu("ભાઈ", "brother", ["sister", "father", "son"]),
+          mcGu("બહેન", "sister", ["brother", "mother", "daughter"]),
+          mcGu("દાદા", "grandfather (paternal)", ["father", "uncle", "grandfather (maternal)"]),
+          mcGu("દાદી", "grandmother (paternal)", ["mother", "aunt", "sister"]),
+          mcGu("નાના", "grandfather (maternal)", ["dad", "uncle", "grandfather (paternal)"]),
+          mcGu("નાની", "grandmother (maternal)", ["mom", "sister", "grandmother (paternal)"]),
+          mcGu("દીકરો", "son", ["daughter", "brother", "father"]),
+          mcGu("દીકરી", "daughter", ["son", "sister", "mother"]),
+          listen("ભાઈ", "brother", ["બહેન", "પિતા", "માતા"]),
+          match([
+            { gu: "માતા", en: "mother" },
+            { gu: "પિતા", en: "father" },
+            { gu: "ભાઈ", en: "brother" },
+            { gu: "બહેન", en: "sister" },
+            { gu: "દીકરો", en: "son" },
+            { gu: "દીકરી", en: "daughter" },
+          ]),
+        ],
+      },
+      {
+        id: "u3l2", title: "My family",
+        exercises: [
+          mcGu("મારી માતા", "my mother", ["your mother", "his mother", "their mother"]),
+          mcGu("મારા પિતા", "my father", ["your father", "his father", "their father"]),
+          mcGu("તમારો ભાઈ", "your brother (polite)", ["my brother", "his brother", "their brother"]),
+          fill("__ બહેન છે.", "મારી", ["મારો", "મારું", "મારા"], "She is my sister. (lit. 'my sister is')"),
+          fill("__ ભાઈ ડૉક્ટર છે.", "મારો", ["મારી", "મારું", "મારા"], "My brother is a doctor."),
+          tap("My mother is happy.", ["મારી", "માતા", "ખુશ", "છે."], ["પિતા", "મારો"]),
+          tap("Your father is a teacher.", ["તમારા", "પિતા", "શિક્ષક", "છે."], ["માતા", "મારી"]),
+          typeIt("My sister is a doctor.", "મારી બહેન ડૉક્ટર છે."),
+          mcGu("તેમના દાદા", "their grandfather", ["my grandfather", "your grandfather", "his grandfather"]),
+          listen("મારી દીકરી નાની છે.", "My daughter is little.", ["મારો દીકરો મોટો છે.", "તેની બહેન ખુશ છે.", "મારી માતા ઘરે છે."]),
+        ],
+      },
+      {
+        id: "u3l3", title: "Describing people",
+        exercises: [
+          mcGu("મોટું", "big", ["small", "tall", "short"]),
+          mcGu("નાનું", "small", ["big", "old", "young"]),
+          mcGu("ઊંચું", "tall", ["short", "wide", "thin"]),
+          mcGu("ટૂંકું", "short (height)", ["tall", "small", "big"]),
+          mcGu("યુવાન", "young", ["old", "tall", "thin"]),
+          mcGu("ઘરડું", "old (person)", ["young", "small", "new"]),
+          mcGu("સુંદર", "beautiful", ["ugly", "small", "tall"]),
+          fill("મારી બહેન __ છે.", "ઊંચી", ["ઊંચું", "ઊંચો", "ઊંચા"], "My sister is tall. (fem.)"),
+          fill("મારો ભાઈ __ છે.", "યુવાન", ["યુવાનો", "યુવાનું", "યુવાનની"], "My brother is young."),
+          tap("My grandfather is old.", ["મારા", "દાદા", "ઘરડા", "છે."], ["નાના", "મોટું"]),
+          typeIt("She is beautiful.", "તે સુંદર છે."),
+          match([
+            { gu: "મોટું", en: "big" },{ gu: "નાનું", en: "small" },
+            { gu: "ઊંચું", en: "tall" },{ gu: "ટૂંકું", en: "short" },
+            { gu: "યુવાન", en: "young" },{ gu: "સુંદર", en: "beautiful" },
+          ]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 4: FOOD ============
+  {
+    id: "u4", cefr: "A1", title: "Food", icon: "🍛", color: "#e09a3c",
+    description: "Foods, eating verbs, ordering",
+    lessons: [
+      {
+        id: "u4l1", title: "Foods & drinks",
+        exercises: [
+          mcGu("પાણી", "water", ["milk", "tea", "juice"]),
+          mcGu("દૂધ", "milk", ["water", "yogurt", "cream"]),
+          mcGu("ચા", "tea", ["coffee", "water", "milk"]),
+          mcGu("રોટલી", "flatbread (roti)", ["rice", "lentils", "vegetable"]),
+          mcGu("ભાત", "rice", ["bread", "wheat", "lentils"]),
+          mcGu("દાળ", "lentils (dal)", ["rice", "bread", "yogurt"]),
+          mcGu("શાક", "vegetable curry", ["pickle", "salad", "fruit"]),
+          mcGu("દહીં", "yogurt", ["milk", "butter", "cream"]),
+          mcGu("ફળ", "fruit", ["vegetable", "sweet", "nut"]),
+          mcGu("મીઠું", "salt", ["sugar", "pepper", "spice"]),
+          mcGu("ખાંડ", "sugar", ["salt", "honey", "spice"]),
+          listen("ચા", "tea", ["દૂધ", "પાણી", "ભાત"]),
+          match([
+            { gu: "પાણી", en: "water" },{ gu: "દૂધ", en: "milk" },
+            { gu: "ચા", en: "tea" },{ gu: "રોટલી", en: "roti" },
+            { gu: "ભાત", en: "rice" },{ gu: "દાળ", en: "dal" },
+          ]),
+        ],
+      },
+      {
+        id: "u4l2", title: "Eating & drinking",
+        exercises: [
+          mcGu("ખાવું", "to eat", ["to drink", "to cook", "to bring"]),
+          mcGu("પીવું", "to drink", ["to eat", "to give", "to take"]),
+          mcGu("જમવું", "to dine / have a meal", ["to bring", "to wash", "to cut"]),
+          mcGu("હું ભાત ખાઉં છું.", "I am eating rice.", ["I am drinking water.", "He eats roti.", "We are cooking."]),
+          mcGu("તે ચા પીએ છે.", "He/she is drinking tea.", ["He eats rice.", "I drink milk.", "We drink water."]),
+          fill("હું દૂધ __ છું.", "પીઉં", ["પીએ", "પીઓ", "પીએ"], "I drink milk."),
+          fill("તું શું __ છે?", "ખાય", ["ખાઉં", "ખાવ", "ખાય"], "What are you eating?"),
+          tap("We are eating dal and rice.", ["અમે", "દાળ", "અને", "ભાત", "ખાઈએ", "છીએ."], ["પીઉં", "દૂધ"]),
+          tap("She drinks tea every morning.", ["તે", "દરરોજ", "સવારે", "ચા", "પીએ", "છે."], ["રાત્રે", "ખાય"]),
+          typeIt("I drink water.", "હું પાણી પીઉં છું.", ["હું પાણી પીઉં છું"]),
+          listen("તે દાળ ખાય છે.", "He/she eats dal.", ["હું પાણી પીઉં છું.", "અમે ચા પીએ છીએ.", "તું શું ખાય છે?"]),
+        ],
+      },
+      {
+        id: "u4l3", title: "At the food stall",
+        exercises: [
+          mcGu("મને એક ચા જોઈએ.", "I want one tea.", ["I want one coffee.", "Give me two roti.", "How much is this?"]),
+          mcGu("કેટલા થયા?", "how much (does it cost)?", ["what is your name?", "where is it?", "how are you?"]),
+          mcGu("ખાંડ વગર", "without sugar", ["with sugar", "without milk", "with salt"]),
+          mcGu("ખાંડ સાથે", "with sugar", ["without sugar", "with milk", "with salt"]),
+          mcGu("મસાલેદાર", "spicy", ["sweet", "bland", "sour"]),
+          mcGu("મીઠું", "sweet", ["sour", "salty", "spicy"]),
+          tap("Give me one tea, please.", ["એક", "ચા", "આપો,", "કૃપા", "કરીને."], ["પાણી", "બે"]),
+          tap("How much does the roti cost?", ["રોટલીના", "કેટલા", "રૂપિયા", "થયા?"], ["ચા", "ભાત"]),
+          typeIt("I want water.", "મને પાણી જોઈએ.", ["મારે પાણી જોઈએ છે."]),
+          fill("ચા __ સારી લાગે છે.", "વગર", ["માં", "પર", "થી"], "Tea without (sugar) tastes good."),
+          listen("મને એક ચા આપો.", "Give me a tea.", ["મારે ભાત જોઈએ.", "પાણી લાવો.", "આ કેટલા?"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 5: PLACES ============
+  {
+    id: "u5", cefr: "A2", title: "Places", icon: "🏠", color: "#7ae0a4",
+    description: "Around town, postpositions, directions",
+    lessons: [
+      {
+        id: "u5l1", title: "Places around town",
+        exercises: [
+          mcGu("ઘર", "house / home", ["school", "shop", "market"]),
+          mcGu("શાળા", "school", ["college", "office", "home"]),
+          mcGu("બજાર", "market", ["shop", "hospital", "school"]),
+          mcGu("દુકાન", "shop / store", ["market", "office", "school"]),
+          mcGu("દવાખાનું", "clinic / hospital", ["pharmacy", "office", "school"]),
+          mcGu("સ્ટેશન", "station", ["airport", "shop", "office"]),
+          mcGu("ઓફિસ", "office", ["school", "shop", "home"]),
+          mcGu("મંદિર", "temple", ["mosque", "church", "school"]),
+          mcGu("ઉદ્યાન", "park / garden", ["forest", "field", "market"]),
+          mcGu("હોટેલ", "hotel / restaurant", ["home", "shop", "office"]),
+          listen("દવાખાનું", "clinic", ["દુકાન", "ઘર", "મંદિર"]),
+          match([
+            { gu: "ઘર", en: "home" },{ gu: "શાળા", en: "school" },
+            { gu: "બજાર", en: "market" },{ gu: "દુકાન", en: "shop" },
+            { gu: "મંદિર", en: "temple" },{ gu: "ઉદ્યાન", en: "park" },
+          ]),
+        ],
+      },
+      {
+        id: "u5l2", title: "In, on, at — postpositions",
+        exercises: [
+          mcGu("ઘરમાં", "in the house", ["at home", "from home", "to the house"]),
+          mcGu("ટેબલ પર", "on the table", ["under the table", "near the table", "in the table"]),
+          mcGu("શાળાએ", "to the school", ["at school", "from school", "near school"]),
+          mcGu("થી", "from", ["to", "with", "on"]),
+          mcGu("ની સાથે", "with (someone)", ["from", "to", "on"]),
+          mcGu("ની પાસે", "near / with (have)", ["far from", "above", "below"]),
+          fill("પુસ્તક ટેબલ __ છે.", "પર", ["માં", "થી", "ની"], "The book is on the table."),
+          fill("હું ઘર __ છું.", "માં", ["પર", "થી", "ની"], "I am in the house."),
+          fill("તે બજાર __ ગયો.", "એ", ["માં", "પર", "થી"], "He went to the market."),
+          tap("The pen is in the bag.", ["પેન", "થેલીમાં", "છે."], ["પર", "થી"]),
+          tap("I live near the school.", ["હું", "શાળાની", "પાસે", "રહું", "છું."], ["દૂર", "માં"]),
+          typeIt("I am at home.", "હું ઘરે છું.", ["હું ઘરમાં છું."]),
+        ],
+      },
+      {
+        id: "u5l3", title: "Asking directions",
+        exercises: [
+          mcGu("ક્યાં છે?", "where is?", ["what is?", "who is?", "when is?"]),
+          mcGu("સીધા જાઓ", "go straight", ["turn left", "stop here", "come back"]),
+          mcGu("જમણી બાજુ", "to the right", ["to the left", "behind", "in front"]),
+          mcGu("ડાબી બાજુ", "to the left", ["to the right", "above", "below"]),
+          mcGu("આગળ", "ahead / forward", ["behind", "left", "right"]),
+          mcGu("પાછળ", "behind / back", ["ahead", "left", "right"]),
+          tap("Where is the station?", ["સ્ટેશન", "ક્યાં", "છે?"], ["શું", "કોણ"]),
+          tap("Go straight, then turn left.", ["સીધા", "જાઓ,", "પછી", "ડાબી", "બાજુ", "વળો."], ["જમણી", "આગળ"]),
+          typeIt("Where is the market?", "બજાર ક્યાં છે?", ["બજાર ક્યાં છે"]),
+          listen("દવાખાનું ક્યાં છે?", "Where is the clinic?", ["શાળા ક્યાં છે?", "બજાર દૂર છે.", "સીધા જાઓ."]),
+          fill("હોટેલ __ બાજુ છે.", "જમણી", ["ડાબું", "પાછળું", "આગળું"], "The hotel is on the right."),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 6: DAILY LIFE ============
+  {
+    id: "u6", cefr: "A2", title: "Daily Life", icon: "⏰", color: "#a47ae0",
+    description: "Time of day, routines, frequency",
+    lessons: [
+      {
+        id: "u6l1", title: "Time of day",
+        exercises: [
+          mcGu("સવારે", "in the morning", ["in the afternoon", "in the evening", "at night"]),
+          mcGu("બપોરે", "in the afternoon", ["in the morning", "at noon", "at night"]),
+          mcGu("સાંજે", "in the evening", ["in the morning", "at noon", "in the afternoon"]),
+          mcGu("રાત્રે", "at night", ["in the morning", "in the evening", "at noon"]),
+          mcGu("આજે", "today", ["tomorrow", "yesterday", "now"]),
+          mcGu("કાલે", "yesterday / tomorrow", ["now", "later", "always"]),
+          mcGu("હમણાં", "now", ["later", "always", "never"]),
+          listen("રાત્રે", "at night", ["સવારે", "બપોરે", "સાંજે"]),
+          match([
+            { gu: "સવારે", en: "morning" },{ gu: "બપોરે", en: "afternoon" },
+            { gu: "સાંજે", en: "evening" },{ gu: "રાત્રે", en: "night" },
+            { gu: "આજે", en: "today" },{ gu: "હમણાં", en: "now" },
+          ]),
+        ],
+      },
+      {
+        id: "u6l2", title: "Daily routines",
+        exercises: [
+          mcGu("ઊઠવું", "to wake up / get up", ["to sleep", "to walk", "to sit"]),
+          mcGu("સૂવું", "to sleep", ["to wake up", "to eat", "to walk"]),
+          mcGu("નહાવું", "to bathe", ["to clean", "to cook", "to dress"]),
+          mcGu("કામ કરવું", "to work", ["to study", "to play", "to rest"]),
+          mcGu("ભણવું", "to study", ["to teach", "to write", "to read"]),
+          fill("હું સવારે છ વાગ્યે __ છું.", "ઊઠું", ["સૂઈ", "ખાઉં", "પીઉં"], "I wake up at 6 in the morning."),
+          fill("તે રાત્રે દસ વાગ્યે __ છે.", "સૂએ", ["ઊઠે", "ખાય", "બોલે"], "He sleeps at 10 at night."),
+          tap("I work every day.", ["હું", "દરરોજ", "કામ", "કરું", "છું."], ["રાત્રે", "સૂઉં"]),
+          tap("She studies in the evening.", ["તે", "સાંજે", "ભણે", "છે."], ["સૂએ", "ઊઠે"]),
+          typeIt("I sleep at night.", "હું રાત્રે સૂઉં છું.", ["હું રાત્રે સુઈ જાઉં છું."]),
+          listen("હું દરરોજ કામ કરું છું.", "I work every day.", ["તે ભણે છે.", "અમે રમીએ છીએ.", "તું ઊઠ."]),
+        ],
+      },
+      {
+        id: "u6l3", title: "How often?",
+        exercises: [
+          mcGu("દરરોજ", "every day / daily", ["sometimes", "never", "rarely"]),
+          mcGu("ક્યારેક", "sometimes", ["always", "never", "often"]),
+          mcGu("ક્યારેય નહીં", "never", ["always", "sometimes", "often"]),
+          mcGu("હંમેશા", "always", ["never", "sometimes", "rarely"]),
+          mcGu("વારંવાર", "often / frequently", ["rarely", "never", "once"]),
+          fill("હું __ ચા પીઉં છું.", "દરરોજ", ["ક્યારેય", "ક્યારેક", "વારંવાર"], "I drink tea every day."),
+          fill("તે __ મોડો આવે છે.", "વારંવાર", ["ક્યારેય નહીં", "દરરોજ", "હંમેશા"], "He often comes late."),
+          tap("She never eats meat.", ["તે", "ક્યારેય", "માંસ", "નથી", "ખાતી."], ["ખાય", "દરરોજ"]),
+          typeIt("I always drink coffee.", "હું હંમેશા કૉફી પીઉં છું."),
+          match([
+            { gu: "દરરોજ", en: "every day" },
+            { gu: "ક્યારેક", en: "sometimes" },
+            { gu: "હંમેશા", en: "always" },
+            { gu: "ક્યારેય નહીં", en: "never" },
+            { gu: "વારંવાર", en: "often" },
+          ]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 7: PAST EVENTS ============
+  {
+    id: "u7", cefr: "A2", title: "Past Events", icon: "📖", color: "#e07a7a",
+    description: "Past tense (incl. ergative), telling stories",
+    lessons: [
+      {
+        id: "u7l1", title: "Simple past (intransitive)",
+        exercises: [
+          mcGu("હું ગયો.", "I went. (masc.)", ["I am going.", "I will go.", "I want to go."]),
+          mcGu("હું ગઈ.", "I went. (fem.)", ["She went.", "He went.", "We went."]),
+          mcGu("તે આવ્યો.", "He came.", ["She came.", "They came.", "He goes."]),
+          mcGu("તે આવી.", "She came.", ["He came.", "I came.", "They came."]),
+          mcGu("અમે ગયા.", "We went.", ["They went.", "We went (fem.).", "I went."]),
+          fill("હું શાળાએ __.", "ગયો", ["જાઉં", "જઈશ", "જવું"], "I went to school. (masc.)"),
+          fill("તે ઘરે __.", "આવી", ["આવ્યો", "આવે", "આવશે"], "She came home."),
+          tap("I went to the market yesterday.", ["હું", "ગઈકાલે", "બજારે", "ગયો."], ["જઈશ", "આવ્યો"]),
+          typeIt("She went home.", "તે ઘરે ગઈ.", ["તે ઘરે ગયી."]),
+          listen("હું ગઈકાલે આવ્યો.", "I came yesterday.", ["હું જઈશ.", "તે આવી.", "અમે ગયા."]),
+        ],
+      },
+      {
+        id: "u7l2", title: "Ergative past (with -એ)",
+        exercises: [
+          mcGu("મેં પુસ્તક વાંચ્યું.", "I read a book.", ["I will read a book.", "I am reading a book.", "He reads a book."]),
+          mcGu("તેણે ચા પીધી.", "He/she drank tea.", ["He drinks tea.", "He will drink tea.", "She wants tea."]),
+          mcGu("તેણીએ રોટલી ખાધી.", "She ate a roti.", ["She eats a roti.", "She is eating roti.", "We ate roti."]),
+          mcGu("તેઓએ ફિલ્મ જોઈ.", "They watched a movie.", ["They are watching a movie.", "We saw the movie.", "He saw a movie."]),
+          fill("__ પાણી પીધું.", "મેં", ["હું", "મારી", "મારે"], "I drank water."),
+          fill("તેણે ભાત __.", "ખાધો", ["ખાય", "ખાશે", "ખાવો"], "He ate rice."),
+          tap("She wrote a letter.", ["તેણીએ", "પત્ર", "લખ્યો."], ["લખે", "લખશે"]),
+          tap("We ate dinner together.", ["અમે", "સાથે", "જમ્યા."], ["જમશે", "જમીએ"]),
+          typeIt("I ate rice.", "મેં ભાત ખાધો.", ["મેં ભાત ખાધો છે."]),
+          listen("તેણે પુસ્તક વાંચ્યું.", "He read the book.", ["તે વાંચે છે.", "મેં લખ્યું.", "અમે જમ્યા."]),
+        ],
+      },
+      {
+        id: "u7l3", title: "Telling a story",
+        exercises: [
+          mcGu("ગઈકાલે", "yesterday", ["tomorrow", "today", "now"]),
+          mcGu("પછી", "then / afterwards", ["before", "now", "always"]),
+          mcGu("પહેલાં", "before / first", ["after", "now", "later"]),
+          tap("Yesterday I went to the market and bought vegetables.",
+              ["ગઈકાલે", "હું", "બજારે", "ગયો", "અને", "શાક", "ખરીદ્યું."],
+              ["જઈશ", "ખરીદીશ"]),
+          tap("First I ate, then I slept.",
+              ["પહેલાં", "મેં", "ખાધું,", "પછી", "હું", "સૂઈ", "ગયો."],
+              ["ઊઠ્યો", "ખાશે"]),
+          typeIt("I went home and slept.", "હું ઘરે ગયો અને સૂઈ ગયો.", ["હું ઘરે ગયો અને સૂઈ ગયો"]),
+          fill("ગઈકાલે __ ફિલ્મ જોઈ.", "મેં", ["હું", "મારી", "મારે"], "Yesterday I watched a movie."),
+          listen("ગઈકાલે અમે મિત્રો સાથે મળ્યા.", "Yesterday we met with friends.",
+                 ["આજે અમે મળીશું.", "તે કાલે આવશે.", "હું ભણું છું."]),
+          mcGu("મેં બધું જોયું.", "I saw everything.", ["I saw something.", "I will see everything.", "I want to see everything."]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 8: FUTURE & PLANS ============
+  {
+    id: "u8", cefr: "B1", title: "Future & Plans", icon: "🚀", color: "#3ce0d6",
+    description: "Future tense, intentions, hopes",
+    lessons: [
+      {
+        id: "u8l1", title: "Future tense",
+        exercises: [
+          mcGu("હું જઈશ.", "I will go.", ["I am going.", "I went.", "I want to go."]),
+          mcGu("તે આવશે.", "He/she will come.", ["He came.", "He is coming.", "He wants to come."]),
+          mcGu("અમે ખાઈશું.", "We will eat.", ["We are eating.", "We ate.", "We want to eat."]),
+          mcGu("તેઓ રમશે.", "They will play.", ["They are playing.", "They played.", "They want to play."]),
+          fill("હું કાલે __.", "આવીશ", ["આવ્યો", "આવું", "આવ"], "I will come tomorrow."),
+          fill("તું શું __?", "કરીશ", ["કરે", "કર્યું", "કરો"], "What will you do?"),
+          tap("Tomorrow we will go to the park.", ["કાલે", "અમે", "ઉદ્યાનમાં", "જઈશું."], ["ગયા", "જઈએ"]),
+          tap("She will read this book.", ["તે", "આ", "પુસ્તક", "વાંચશે."], ["વાંચે", "વાંચ્યું"]),
+          typeIt("I will eat rice.", "હું ભાત ખાઈશ.", ["હું ભાત ખાઈશ."]),
+          listen("હું કાલે મળીશ.", "I will meet tomorrow.", ["હું મળ્યો.", "તે આવી.", "અમે ગયા."]),
+        ],
+      },
+      {
+        id: "u8l2", title: "Plans & intentions",
+        exercises: [
+          mcGu("હું ભણવા માંગુ છું.", "I want to study.", ["I am studying.", "I will study.", "I studied."]),
+          mcGu("તે ડૉક્ટર બનવા માંગે છે.", "He wants to become a doctor.", ["He is a doctor.", "He became a doctor.", "He met a doctor."]),
+          mcGu("મારી યોજના છે", "I have a plan", ["I had a plan", "I want a plan", "I made a plan"]),
+          mcGu("મારે કામ કરવું છે.", "I have to work.", ["I am working.", "I work.", "I worked."]),
+          fill("તારે શું __ છે?", "કરવું", ["કરે", "કરો", "કરી"], "What do you have to do?"),
+          tap("I want to learn Gujarati.", ["મારે", "ગુજરાતી", "શીખવી", "છે."], ["શીખ્યો", "શીખે"]),
+          tap("We are planning to travel.", ["અમે", "મુસાફરી", "કરવાની", "યોજના", "બનાવી", "રહ્યા", "છીએ."], ["કરી", "બનાવી"]),
+          typeIt("I want to go home.", "મારે ઘરે જવું છે.", ["હું ઘરે જવા માંગુ છું."]),
+          listen("હું દિલ્હી જવા માંગુ છું.", "I want to go to Delhi.", ["હું દિલ્હી ગયો.", "તે મુંબઈ આવશે.", "અમે ઘરે છીએ."]),
+          mcGu("આશા છે", "(I) hope", ["(I) think", "(I) believe", "(I) know"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 9: OPINIONS & CONDITIONALS ============
+  {
+    id: "u9", cefr: "B1", title: "Opinions & Conditions", icon: "💭", color: "#e0c43c",
+    description: "Likes, conditionals, agreement",
+    lessons: [
+      {
+        id: "u9l1", title: "Likes & dislikes",
+        exercises: [
+          mcGu("મને ગમે છે", "I like (it)", ["I love (it)", "I hate (it)", "I want (it)"]),
+          mcGu("મને નથી ગમતું", "I don't like (it)", ["I like (it)", "I don't want (it)", "I haven't seen (it)"]),
+          mcGu("મને ચા ગમે છે.", "I like tea.", ["I drink tea.", "I want tea.", "I hate tea."]),
+          mcGu("તેને ભાત નથી ગમતો.", "He doesn't like rice.", ["He likes rice.", "He eats rice.", "He wants rice."]),
+          fill("મને ગુજરાતી ભાષા __ છે.", "ગમે", ["ગમ્યું", "ગમશે", "ગમતું"], "I like the Gujarati language."),
+          tap("She loves chocolate.", ["તેને", "ચોકલેટ", "ખૂબ", "ગમે", "છે."], ["નથી", "ગમતી"]),
+          typeIt("I like reading books.", "મને પુસ્તકો વાંચવા ગમે છે.", ["મને પુસ્તકો વાંચવાનું ગમે છે."]),
+          mcGu("મારી પ્રિય ફિલ્મ", "my favorite movie", ["a famous movie", "his movie", "a new movie"]),
+          listen("મને સંગીત ખૂબ ગમે છે.", "I really like music.", ["મને કંઈ ગમતું નથી.", "તે ગાય છે.", "અમે સાંભળીએ છીએ."]),
+          match([
+            { gu: "ગમે છે", en: "like" },{ gu: "ગમતું નથી", en: "don't like" },
+            { gu: "ખૂબ", en: "very" },{ gu: "પ્રિય", en: "favorite/dear" },
+          ]),
+        ],
+      },
+      {
+        id: "u9l2", title: "If… then…",
+        exercises: [
+          mcGu("જો વરસાદ આવે, તો હું નહીં આવું.", "If it rains, I won't come.", ["When it rained, I didn't come.", "It is raining and I am not coming.", "I won't come unless it rains."]),
+          mcGu("જો તું પ્રયત્ન કરે, તો સફળ થશે.", "If you try, you will succeed.", ["You try, and you succeed.", "Try and you'll fail.", "When you tried, you succeeded."]),
+          fill("__ તું જશે, તો હું પણ આવીશ.", "જો", ["પણ", "તો", "અને"], "If you go, I'll come too."),
+          fill("જો સમય હશે, __ આવીશ.", "તો", ["જો", "પણ", "અને"], "If there's time, then I'll come."),
+          tap("If I study, I will pass.", ["જો", "હું", "ભણીશ,", "તો", "પાસ", "થઈશ."], ["નહીં", "આવ્યો"]),
+          typeIt("If you call, I will answer.", "જો તું ફોન કરશે, તો હું જવાબ આપીશ.", ["જો તમે ફોન કરશો, તો હું જવાબ આપીશ."]),
+          tap("If it's hot, drink water.", ["જો", "ગરમી", "હોય,", "તો", "પાણી", "પીજો."], ["ઠંડી", "પીધું"]),
+          listen("જો તારે જરૂર હોય, તો બોલજે.", "If you need anything, just say.", ["તું ગયો.", "મેં કહ્યું.", "તે આવશે."]),
+        ],
+      },
+      {
+        id: "u9l3", title: "Agreeing, disagreeing & opinions",
+        exercises: [
+          mcGu("મને લાગે છે કે…", "I think that…", ["I know that…", "I want that…", "I said that…"]),
+          mcGu("હું સહમત છું", "I agree", ["I disagree", "I don't know", "I'm tired"]),
+          mcGu("હું સહમત નથી", "I don't agree", ["I agree", "I'm right", "I'm wrong"]),
+          mcGu("મારા મતે", "in my opinion", ["in your opinion", "actually", "always"]),
+          mcGu("સાચું છે", "(it's) true", ["(it's) false", "(it's) okay", "(it's) important"]),
+          tap("In my opinion, this is the best book.",
+              ["મારા", "મતે", ",", "આ", "સૌથી", "સારું", "પુસ્તક", "છે."], ["ખરાબ", "નથી"]),
+          tap("I agree with you on this matter.",
+              ["હું", "આ", "બાબતે", "તારી", "સાથે", "સહમત", "છું."], ["નથી", "મારી"]),
+          typeIt("I think Gujarati is beautiful.", "મને લાગે છે કે ગુજરાતી સુંદર છે."),
+          fill("__ મતે, આ સારું નથી.", "મારા", ["તારી", "તેના", "આપણા"], "In my opinion, this isn't good."),
+          listen("મને એમ લાગે છે કે તે સાચું છે.", "I feel that's correct.",
+                 ["મને ખબર નથી.", "તે ખોટું છે.", "મેં વાંચ્યું."]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 10: ADVANCED ============
+  {
+    id: "u10", cefr: "B1+", title: "Advanced Discourse", icon: "🎓", color: "#c43ce0",
+    description: "Idioms, formal register, nuance",
+    lessons: [
+      {
+        id: "u10l1", title: "Connectors & nuance",
+        exercises: [
+          mcGu("તેમ છતાં", "even so / nevertheless", ["because", "if", "then"]),
+          mcGu("એટલે", "so / therefore", ["but", "and", "or"]),
+          mcGu("પરંતુ", "but (formal)", ["and", "because", "if"]),
+          mcGu("કારણ કે", "because", ["so that", "even though", "as long as"]),
+          mcGu("એમ છતાં", "however", ["so", "because", "until"]),
+          mcGu("લગભગ", "approximately / nearly", ["exactly", "only", "rarely"]),
+          tap("He's tired, but he keeps working.",
+              ["તે", "થાકેલો", "છે,", "પરંતુ", "કામ", "ચાલુ", "રાખે", "છે."], ["નથી", "છોડે"]),
+          tap("Although it rained, we went to the market.",
+              ["જોકે", "વરસાદ", "પડ્યો,", "અમે", "બજારે", "ગયા."], ["કારણ", "આવ્યા"]),
+          typeIt("I am tired, but I am happy.", "હું થાકેલો છું, પણ ખુશ છું.", ["હું થાકી ગયો છું, પણ ખુશ છું."]),
+          listen("તેણે મને કહ્યું તેમ છતાં હું ગયો.", "I went even though he told me (not to).",
+                 ["તે મારી સાથે આવ્યો.", "મેં તેને કહ્યું.", "અમે મળ્યા."]),
+        ],
+      },
+      {
+        id: "u10l2", title: "Idiomatic Gujarati",
+        exercises: [
+          mcGu("મન મૂકીને", "wholeheartedly", ["reluctantly", "in a hurry", "secretly"]),
+          mcGu("આંખે વળગવું", "to catch one's eye", ["to look away", "to wink", "to cry"]),
+          mcGu("પાણીમાં હાથ નાખવો", "to meddle / interfere", ["to wash hands", "to swim", "to drink water"]),
+          mcGu("મગજ ખાવું", "to nag / pester (lit. 'eat someone's brain')", ["to think hard", "to forget", "to remember"]),
+          mcGu("આકાશ-પાતાળ એક કરવા", "to move heaven and earth", ["to look up", "to argue", "to escape"]),
+          mcGu("ધૂળ ચાટવી", "to suffer defeat (lit. 'lick dust')", ["to win easily", "to give up", "to celebrate"]),
+          tap("He worked wholeheartedly.", ["તેણે", "મન", "મૂકીને", "કામ", "કર્યું."], ["ખાધું", "ધીમે"]),
+          typeIt("She caught my eye.", "તે મારી આંખે વળગી.", ["તે મારી નજરે ચડી."]),
+          listen("તેનું મગજ ખા નહીં!", "Stop pestering him!",
+                 ["તે ખુશ છે.", "મગજ સારું છે.", "ચૂપ રહો."]),
+          match([
+            { gu: "મન મૂકીને", en: "wholeheartedly" },
+            { gu: "આંખે વળગવું", en: "to catch the eye" },
+            { gu: "પાણીમાં હાથ નાખવો", en: "to meddle" },
+            { gu: "મગજ ખાવું", en: "to pester" },
+          ]),
+        ],
+      },
+      {
+        id: "u10l3", title: "Formal register",
+        exercises: [
+          mcGu("આપ", "you (very formal)", ["I (formal)", "we", "they"]),
+          mcGu("આપનું નામ શું છે?", "what is your name? (very formal)", ["what's your name? (casual)", "who are you?", "where are you from?"]),
+          mcGu("કૃપા કરીને", "please (formal)", ["thank you", "excuse me", "sorry"]),
+          mcGu("ક્ષમા કરો", "(please) forgive / excuse me (formal)", ["thank you", "hello", "please"]),
+          mcGu("શ્રીમાન", "Mr. (sir)", ["Mrs.", "Miss", "Dr."]),
+          mcGu("શ્રીમતી", "Mrs. (madam)", ["Mr.", "Miss", "Dr."]),
+          mcGu("આદરણીય", "respected / dear (formal address)", ["dear (casual)", "friend", "colleague"]),
+          tap("Respected Sir, please be seated.",
+              ["આદરણીય", "શ્રીમાન,", "કૃપા", "કરીને", "બેસો."], ["આવો", "ઊઠો"]),
+          typeIt("May I have your attention, please?", "કૃપા કરીને ધ્યાન આપો.", ["કૃપા કરીને મારી વાત સાંભળો."]),
+          listen("આદરણીય મહોદય, આપનું સ્વાગત છે.", "Respected sir, you are welcome.",
+                 ["નમસ્તે, કેમ છો?", "ચાલો જઈએ.", "આભાર, મિત્ર."]),
+        ],
+      },
+      {
+        id: "u10l4", title: "Discussion & debate",
+        exercises: [
+          mcGu("ઉદાહરણ તરીકે", "for example", ["in conclusion", "however", "because"]),
+          mcGu("મારો અભિપ્રાય છે કે", "my view is that", ["I heard that", "I forgot that", "I asked if"]),
+          mcGu("તેનો અર્થ એ થયો", "that means / it means", ["that's wrong", "that's right", "that's enough"]),
+          mcGu("એક રીતે જોતાં", "in a way / from one perspective", ["entirely", "rarely", "never"]),
+          tap("For example, education is very important.",
+              ["ઉદાહરણ", "તરીકે,", "શિક્ષણ", "ખૂબ", "મહત્વનું", "છે."], ["નથી", "નાનું"]),
+          tap("In my view, both sides are right.",
+              ["મારા", "મતે,", "બંને", "પક્ષ", "સાચા", "છે."], ["ખોટા", "એક"]),
+          typeIt("Education is the foundation of progress.", "શિક્ષણ પ્રગતિનો પાયો છે.", ["શિક્ષણ વિકાસનો પાયો છે."]),
+          listen("આ વિષય પર ચર્ચા કરવી જરૂરી છે.", "It's necessary to discuss this topic.",
+                 ["ચાલો રમીએ.", "મને ભૂખ લાગી છે.", "આવજો, મિત્ર."]),
+          mcGu("નિષ્કર્ષ", "conclusion", ["beginning", "question", "answer"]),
+          mcGu("મહત્વનું", "important", ["unimportant", "small", "easy"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 11: HEALTH & BODY ============
+  {
+    id: "u11", cefr: "A2/B1", title: "Health & Body", icon: "🩺", color: "#e0455d",
+    description: "Body parts, illness, at the doctor",
+    lessons: [
+      {
+        id: "u11l1", title: "Body parts",
+        exercises: [
+          mcGu("માથું", "head", ["face", "hair", "neck"]),
+          mcGu("આંખ", "eye", ["ear", "nose", "mouth"]),
+          mcGu("કાન", "ear", ["eye", "mouth", "tongue"]),
+          mcGu("નાક", "nose", ["mouth", "chin", "lip"]),
+          mcGu("મોં", "mouth", ["tongue", "tooth", "lip"]),
+          mcGu("દાંત", "tooth", ["tongue", "lip", "throat"]),
+          mcGu("ગળું", "throat", ["mouth", "chest", "stomach"]),
+          mcGu("હાથ", "hand / arm", ["leg", "foot", "shoulder"]),
+          mcGu("પગ", "foot / leg", ["hand", "knee", "back"]),
+          mcGu("પેટ", "stomach / belly", ["chest", "back", "heart"]),
+          mcGu("હૃદય", "heart", ["lung", "liver", "stomach"]),
+          mcGu("પીઠ", "back", ["chest", "shoulder", "waist"]),
+          listen("આંખ", "eye", ["કાન", "નાક", "મોં"]),
+          match([
+            { gu: "માથું", en: "head" },{ gu: "આંખ", en: "eye" },
+            { gu: "હાથ", en: "hand" },{ gu: "પગ", en: "foot" },
+            { gu: "પેટ", en: "stomach" },{ gu: "હૃદય", en: "heart" },
+          ]),
+        ],
+      },
+      {
+        id: "u11l2", title: "Illness & symptoms",
+        exercises: [
+          mcGu("તાવ", "fever", ["cold", "cough", "pain"]),
+          mcGu("શરદી", "cold (illness)", ["fever", "cough", "wound"]),
+          mcGu("ઉધરસ", "cough", ["fever", "cold", "sneeze"]),
+          mcGu("દુખાવો", "pain / ache", ["wound", "fever", "swelling"]),
+          mcGu("માથાનો દુખાવો", "headache", ["stomach ache", "back pain", "toothache"]),
+          mcGu("થાક", "tiredness / fatigue", ["weakness", "sleep", "fear"]),
+          mcGu("ઉલટી", "vomiting", ["nausea", "diarrhea", "dizziness"]),
+          mcGu("દવા", "medicine", ["doctor", "hospital", "injection"]),
+          mcGu("ઘા", "wound / cut", ["scar", "bruise", "burn"]),
+          fill("મને __ આવ્યો છે.", "તાવ", ["દવા", "ઘા", "પગ"], "I have a fever."),
+          fill("મારું __ દુખે છે.", "માથું", ["ઘર", "પુસ્તક", "બાળક"], "My head hurts."),
+          tap("I have a stomach ache.", ["મને", "પેટનો", "દુખાવો", "છે."], ["માથાનો", "નથી"]),
+          typeIt("I am sick.", "હું બીમાર છું.", ["હું માંદો છું."]),
+          listen("મને શરદી થઈ છે.", "I have caught a cold.", ["મને તાવ છે.", "મારું પેટ દુખે છે.", "હું થાકી ગયો છું."]),
+        ],
+      },
+      {
+        id: "u11l3", title: "At the doctor",
+        exercises: [
+          mcGu("ડૉક્ટર", "doctor", ["nurse", "patient", "medicine"]),
+          mcGu("દવાખાનું", "clinic / hospital", ["pharmacy", "lab", "office"]),
+          mcGu("દર્દી", "patient", ["doctor", "nurse", "visitor"]),
+          mcGu("તપાસ", "examination / checkup", ["test", "surgery", "diet"]),
+          mcGu("ઈન્જેક્શન", "injection / shot", ["pill", "syrup", "cream"]),
+          tap("Doctor, my head has been hurting since yesterday.",
+              ["ડૉક્ટર,", "મારું", "માથું", "ગઈકાલથી", "દુખે", "છે."], ["નથી", "પેટ"]),
+          tap("Take this medicine twice a day.",
+              ["આ", "દવા", "દિવસમાં", "બે", "વાર", "લો."], ["ત્રણ", "ખાઓ"]),
+          typeIt("I need a doctor.", "મારે ડૉક્ટરની જરૂર છે.", ["મને ડૉક્ટર જોઈએ."]),
+          fill("ડૉક્ટરે મને __ આપી.", "દવા", ["પગ", "ઘર", "પુસ્તક"], "The doctor gave me medicine."),
+          listen("તમારી તબિયત કેવી છે?", "How is your health?", ["તમારું નામ શું છે?", "આ શું છે?", "તમે ક્યાં છો?"]),
+          mcGu("તબિયત", "health / well-being", ["happiness", "wealth", "youth"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 12: SHOPPING & MONEY ============
+  {
+    id: "u12", cefr: "A2/B1", title: "Shopping & Money", icon: "💰", color: "#f0a830",
+    description: "Currency, transactions, bargaining",
+    lessons: [
+      {
+        id: "u12l1", title: "Money & numbers",
+        exercises: [
+          mcGu("રૂપિયા", "rupees", ["dollars", "coins", "notes"]),
+          mcGu("પૈસા", "money / paise", ["bank", "purse", "card"]),
+          mcGu("સો", "hundred", ["thousand", "ten", "twenty"]),
+          mcGu("હજાર", "thousand", ["hundred", "lakh", "ten"]),
+          mcGu("લાખ", "hundred thousand (lakh)", ["thousand", "crore", "million"]),
+          mcGu("કરોડ", "ten million (crore)", ["lakh", "thousand", "billion"]),
+          mcGu("ભાવ", "price / rate", ["change", "shop", "deal"]),
+          mcGu("મોંઘું", "expensive", ["cheap", "free", "broken"]),
+          mcGu("સસ્તું", "cheap / inexpensive", ["expensive", "valuable", "rare"]),
+          mcGu("મફત", "free (no cost)", ["paid", "cheap", "broken"]),
+          fill("આનો __ શું છે?", "ભાવ", ["દામ", "નામ", "પૈસા"], "What is the price of this?"),
+          tap("This is too expensive.", ["આ", "ખૂબ", "મોંઘું", "છે."], ["સસ્તું", "નથી"]),
+          typeIt("How much does this cost?", "આ કેટલાનું છે?", ["આનો ભાવ શું છે?"]),
+          listen("આ સો રૂપિયાનું છે.", "This is for one hundred rupees.", ["આ મફત છે.", "પાંચ રૂપિયા આપો.", "આ સસ્તું છે."]),
+        ],
+      },
+      {
+        id: "u12l2", title: "At the store",
+        exercises: [
+          mcGu("દુકાનદાર", "shopkeeper", ["customer", "owner", "manager"]),
+          mcGu("ગ્રાહક", "customer", ["seller", "owner", "visitor"]),
+          mcGu("ખરીદવું", "to buy", ["to sell", "to give", "to take"]),
+          mcGu("વેચવું", "to sell", ["to buy", "to lend", "to keep"]),
+          mcGu("મને બતાવો", "show me", ["give me", "tell me", "sell me"]),
+          mcGu("આ સારું છે", "this is good", ["this is bad", "this is mine", "this is new"]),
+          tap("I want to buy this shirt.",
+              ["મારે", "આ", "શર્ટ", "ખરીદવી", "છે."], ["વેચવી", "નથી"]),
+          tap("Show me another color.",
+              ["મને", "બીજો", "રંગ", "બતાવો."], ["લાવો", "આપો"]),
+          fill("હું બજારે __ છું.", "જાઉં", ["જઈશ", "ગયો", "જા"], "I go to the market."),
+          typeIt("I'll take this one.", "હું આ લઈશ.", ["મારે આ જોઈએ છે."]),
+          listen("આ બે મળીને કેટલા થયા?", "How much for these two together?",
+                 ["આ કેટલું મોટું છે?", "આ સારું છે.", "મારે જવું છે."]),
+          mcGu("રસીદ", "receipt", ["bill", "ticket", "note"]),
+        ],
+      },
+      {
+        id: "u12l3", title: "Bargaining",
+        exercises: [
+          mcGu("થોડું ઓછું કરો", "lower the price a bit", ["raise it", "keep it same", "show me more"]),
+          mcGu("આટલા ઓછા નહીં થાય", "won't go that low", ["that's a good price", "yes, I agree", "that's too high"]),
+          mcGu("છેલ્લો ભાવ", "last / final price", ["first offer", "starting bid", "discount"]),
+          mcGu("છૂટ", "discount", ["tax", "tip", "fee"]),
+          tap("Can you give me a discount?", ["શું", "છૂટ", "આપી", "શકો", "છો?"], ["નહીં", "ભાવ"]),
+          tap("Your final price?", ["તમારો", "છેલ્લો", "ભાવ", "શું?"], ["પહેલો", "ઓછો"]),
+          typeIt("Please reduce the price.", "કૃપા કરીને ભાવ ઓછો કરો.", ["ભાવ ઓછો કરો."]),
+          fill("આ બહુ __ છે, ભાવ ઓછો કરો.", "મોંઘું", ["સસ્તું", "મફત", "નાનું"], "This is too expensive — lower the price."),
+          mcGu("આટલે ચાલશે?", "will this much do?", ["how much is this?", "is this enough?", "do you have more?"]),
+          listen("હું પચાસ રૂપિયા ઓછા આપીશ.", "I'll pay fifty rupees less.",
+                 ["પચાસ વધારે આપો.", "આ સારું છે.", "છૂટ આપો."]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 13: WEATHER & SEASONS ============
+  {
+    id: "u13", cefr: "A2/B1", title: "Weather & Seasons", icon: "☀️", color: "#3cbce0",
+    description: "Weather, seasons, climate talk",
+    lessons: [
+      {
+        id: "u13l1", title: "Weather basics",
+        exercises: [
+          mcGu("હવામાન", "weather", ["climate", "season", "wind"]),
+          mcGu("ગરમી", "heat / hot", ["cold", "rain", "snow"]),
+          mcGu("ઠંડી", "cold", ["heat", "snow", "wind"]),
+          mcGu("વરસાદ", "rain", ["snow", "wind", "fog"]),
+          mcGu("તડકો", "sunshine / sunlight", ["shade", "cloud", "rain"]),
+          mcGu("વાદળ", "cloud", ["rain", "sun", "sky"]),
+          mcGu("પવન", "wind", ["storm", "rain", "fog"]),
+          mcGu("ધુમ્મસ", "fog / mist", ["rain", "wind", "cloud"]),
+          mcGu("તોફાન", "storm", ["wind", "rain", "thunder"]),
+          mcGu("વીજળી", "lightning / electricity", ["thunder", "storm", "fire"]),
+          listen("આજે વરસાદ પડે છે.", "It's raining today.", ["આજે તડકો છે.", "આજે ઠંડી છે.", "આજે ગરમી છે."]),
+          match([
+            { gu: "ગરમી", en: "heat" },{ gu: "ઠંડી", en: "cold" },
+            { gu: "વરસાદ", en: "rain" },{ gu: "પવન", en: "wind" },
+            { gu: "વાદળ", en: "cloud" },{ gu: "તડકો", en: "sunshine" },
+          ]),
+        ],
+      },
+      {
+        id: "u13l2", title: "The seasons",
+        exercises: [
+          mcGu("ઋતુ", "season", ["weather", "year", "day"]),
+          mcGu("ઉનાળો", "summer", ["winter", "monsoon", "spring"]),
+          mcGu("શિયાળો", "winter", ["summer", "autumn", "spring"]),
+          mcGu("ચોમાસું", "monsoon / rainy season", ["summer", "winter", "spring"]),
+          mcGu("વસંત", "spring", ["autumn", "summer", "winter"]),
+          mcGu("પાનખર", "autumn / fall", ["spring", "summer", "winter"]),
+          fill("__ માં બહુ ગરમી હોય છે.", "ઉનાળા", ["શિયાળા", "ચોમાસા", "વસંત"], "It's very hot in summer."),
+          fill("__ માં વરસાદ પડે છે.", "ચોમાસા", ["ઉનાળા", "શિયાળા", "વસંત"], "It rains in the monsoon."),
+          tap("In winter, the days are short.", ["શિયાળામાં", "દિવસો", "ટૂંકા", "હોય", "છે."], ["લાંબા", "નથી"]),
+          typeIt("I love the monsoon.", "મને ચોમાસું ખૂબ ગમે છે.", ["મને ચોમાસું ગમે છે."]),
+          listen("ઉનાળામાં બહુ ગરમી હોય છે.", "It's very hot in summer.",
+                 ["શિયાળામાં ઠંડી હોય છે.", "ચોમાસામાં વરસાદ પડે છે.", "વસંતમાં ફૂલો ખીલે છે."]),
+        ],
+      },
+      {
+        id: "u13l3", title: "Talking about weather",
+        exercises: [
+          mcGu("આજનું હવામાન કેવું છે?", "how is the weather today?", ["what time is it?", "what is your name?", "where is the market?"]),
+          mcGu("તાપમાન", "temperature", ["pressure", "humidity", "wind speed"]),
+          mcGu("ભેજ", "humidity", ["temperature", "wind", "rain"]),
+          mcGu("આબોહવા", "climate", ["weather (today)", "wind", "season"]),
+          tap("Today the weather is pleasant.",
+              ["આજે", "હવામાન", "સારું", "છે."], ["ખરાબ", "નથી"]),
+          tap("It's likely to rain today.",
+              ["આજે", "વરસાદ", "પડે", "એવી", "શક્યતા", "છે."], ["નહીં", "પડ્યો"]),
+          typeIt("It's very hot today.", "આજે ખૂબ ગરમી છે.", ["આજે બહુ ગરમી છે."]),
+          fill("__ બહુ વધી ગયું છે.", "તાપમાન", ["ભેજ", "પવન", "ઘર"], "The temperature has risen a lot."),
+          listen("આજે વાદળછાયું વાતાવરણ છે.", "Today the weather is cloudy.",
+                 ["આજે તડકો છે.", "આજે વરસાદ પડે છે.", "આજે ઠંડી છે."]),
+          mcGu("વાતાવરણ", "atmosphere / environment", ["mood", "scene", "scenery"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 14: WORK & CAREER ============
+  {
+    id: "u14", cefr: "B1", title: "Work & Career", icon: "💼", color: "#7c5fe0",
+    description: "Jobs, workplace, interviews",
+    lessons: [
+      {
+        id: "u14l1", title: "Jobs & professions",
+        exercises: [
+          mcGu("શિક્ષક", "teacher", ["doctor", "lawyer", "student"]),
+          mcGu("ઈજનેર", "engineer", ["doctor", "accountant", "manager"]),
+          mcGu("વકીલ", "lawyer", ["judge", "doctor", "teacher"]),
+          mcGu("ખેડૂત", "farmer", ["merchant", "soldier", "worker"]),
+          mcGu("વેપારી", "merchant / trader", ["farmer", "engineer", "clerk"]),
+          mcGu("કલાકાર", "artist", ["singer", "writer", "actor"]),
+          mcGu("લેખક", "writer / author", ["reader", "speaker", "translator"]),
+          mcGu("પત્રકાર", "journalist", ["writer", "editor", "publisher"]),
+          mcGu("મેનેજર", "manager", ["assistant", "owner", "worker"]),
+          mcGu("કારકુન", "clerk", ["officer", "manager", "owner"]),
+          match([
+            { gu: "શિક્ષક", en: "teacher" },{ gu: "ઈજનેર", en: "engineer" },
+            { gu: "વકીલ", en: "lawyer" },{ gu: "ખેડૂત", en: "farmer" },
+            { gu: "વેપારી", en: "merchant" },{ gu: "પત્રકાર", en: "journalist" },
+          ]),
+          mcGu("તમે શું કરો છો?", "what do you do? (work)", ["how are you?", "where are you from?", "what's your name?"]),
+        ],
+      },
+      {
+        id: "u14l2", title: "At the office",
+        exercises: [
+          mcGu("ઓફિસ", "office", ["factory", "shop", "home"]),
+          mcGu("સહકાર્યકર", "colleague / coworker", ["boss", "friend", "client"]),
+          mcGu("બોસ", "boss", ["colleague", "client", "intern"]),
+          mcGu("મિટિંગ", "meeting", ["party", "event", "lunch"]),
+          mcGu("પગાર", "salary", ["bonus", "tip", "loan"]),
+          mcGu("રજા", "leave / holiday", ["weekend", "trip", "break"]),
+          mcGu("હાજરી", "attendance", ["presence", "absence", "report"]),
+          mcGu("તાલીમ", "training", ["meeting", "workshop", "review"]),
+          fill("આજે ઓફિસમાં __ છે.", "મિટિંગ", ["દવા", "ભોજન", "બાળક"], "There's a meeting at the office today."),
+          tap("I have to take leave tomorrow.",
+              ["મારે", "કાલે", "રજા", "લેવી", "પડશે."], ["નહીં", "આપવી"]),
+          typeIt("My salary is good.", "મારો પગાર સારો છે."),
+          listen("હું હમણાં ઓફિસમાં છું.", "I am at the office right now.",
+                 ["હું ઘરે છું.", "હું બજારે જાઉં છું.", "આજે રજા છે."]),
+        ],
+      },
+      {
+        id: "u14l3", title: "Job interview",
+        exercises: [
+          mcGu("મુલાકાત", "interview / meeting", ["test", "exam", "party"]),
+          mcGu("અનુભવ", "experience", ["skill", "training", "education"]),
+          mcGu("લાયકાત", "qualification", ["experience", "talent", "license"]),
+          mcGu("શક્તિ", "strength", ["weakness", "skill", "experience"]),
+          mcGu("નબળાઈ", "weakness", ["strength", "skill", "habit"]),
+          tap("Tell me about yourself.",
+              ["તમારા", "વિશે", "મને", "જણાવો."], ["નહીં", "બતાવી"]),
+          tap("I have five years of experience.",
+              ["મારી", "પાસે", "પાંચ", "વર્ષનો", "અનુભવ", "છે."], ["નથી", "વર્ષોનો"]),
+          typeIt("I want this job.", "મારે આ નોકરી જોઈએ છે.", ["મારે આ નોકરી જોઈએ."]),
+          listen("તમારી શક્તિ શું છે?", "What is your strength?",
+                 ["તમારું નામ શું?", "તમે ક્યાં રહો છો?", "તમારી નોકરી શું?"]),
+          mcGu("ઉમેદવાર", "candidate / applicant", ["interviewer", "manager", "boss"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 15: TRAVEL & TRANSPORT ============
+  {
+    id: "u15", cefr: "B1", title: "Travel & Transport", icon: "🚆", color: "#28a99e",
+    description: "Getting around, booking, itineraries",
+    lessons: [
+      {
+        id: "u15l1", title: "Modes of transport",
+        exercises: [
+          mcGu("ગાડી", "car", ["bus", "train", "plane"]),
+          mcGu("બસ", "bus", ["car", "train", "rickshaw"]),
+          mcGu("ટ્રેન", "train", ["bus", "plane", "ship"]),
+          mcGu("વિમાન", "airplane", ["ship", "train", "bus"]),
+          mcGu("રિક્ષા", "rickshaw / auto", ["taxi", "scooter", "bike"]),
+          mcGu("સ્કૂટર", "scooter", ["bike", "car", "bus"]),
+          mcGu("સાયકલ", "bicycle", ["motorcycle", "scooter", "skateboard"]),
+          mcGu("જહાજ", "ship", ["boat", "submarine", "raft"]),
+          listen("ટ્રેન", "train", ["બસ", "વિમાન", "ગાડી"]),
+          match([
+            { gu: "ગાડી", en: "car" },{ gu: "બસ", en: "bus" },
+            { gu: "ટ્રેન", en: "train" },{ gu: "વિમાન", en: "plane" },
+            { gu: "રિક્ષા", en: "rickshaw" },{ gu: "જહાજ", en: "ship" },
+          ]),
+        ],
+      },
+      {
+        id: "u15l2", title: "At the station / airport",
+        exercises: [
+          mcGu("સ્ટેશન", "station", ["airport", "platform", "bus stop"]),
+          mcGu("એરપોર્ટ", "airport", ["station", "harbour", "port"]),
+          mcGu("ટિકિટ", "ticket", ["pass", "receipt", "boarding pass"]),
+          mcGu("પ્લેટફોર્મ", "platform", ["track", "gate", "station"]),
+          mcGu("મુસાફર", "passenger / traveler", ["driver", "guide", "conductor"]),
+          mcGu("સામાન", "luggage / belongings", ["bag", "wallet", "ticket"]),
+          mcGu("ઊપડવું", "to depart (start moving)", ["to arrive", "to wait", "to stop"]),
+          mcGu("પહોંચવું", "to arrive / reach", ["to leave", "to wait", "to fall"]),
+          tap("The train will depart in five minutes.",
+              ["ટ્રેન", "પાંચ", "મિનિટમાં", "ઊપડશે."], ["પહોંચશે", "વાગે"]),
+          tap("Where is platform number two?",
+              ["પ્લેટફોર્મ", "નંબર", "બે", "ક્યાં", "છે?"], ["કેમ", "નથી"]),
+          typeIt("I want one ticket to Ahmedabad.", "મારે અમદાવાદની એક ટિકિટ જોઈએ.", ["મને અમદાવાદની એક ટિકિટ આપો."]),
+          listen("ટ્રેન મોડી છે.", "The train is late.",
+                 ["ટ્રેન સમયસર છે.", "પ્લેટફોર્મ બદલાયું.", "બસ ઊપડી ગઈ."]),
+        ],
+      },
+      {
+        id: "u15l3", title: "Planning a trip",
+        exercises: [
+          mcGu("મુસાફરી", "journey / travel", ["arrival", "departure", "tour"]),
+          mcGu("પ્રવાસ", "trip / tour", ["picnic", "vacation", "outing"]),
+          mcGu("હોટેલ", "hotel", ["restaurant", "guesthouse", "resort"]),
+          mcGu("બુકિંગ", "booking / reservation", ["payment", "ticket", "form"]),
+          mcGu("આયોજન", "planning / arrangement", ["thinking", "wishing", "buying"]),
+          tap("We are planning a trip to Goa.",
+              ["અમે", "ગોવાનો", "પ્રવાસ", "આયોજન", "કરી", "રહ્યા", "છીએ."], ["કર્યું", "ગયા"]),
+          tap("Have you booked the hotel?",
+              ["શું", "તમે", "હોટેલ", "બુક", "કરી?"], ["નથી", "કરશે"]),
+          typeIt("I want to travel to Mumbai next month.", "મારે આવતા મહિને મુંબઈ જવું છે.", ["મારે આવતા મહિને મુંબઈ જવાનું છે."]),
+          fill("હું __ આયોજન કરું છું.", "પ્રવાસનું", ["પ્રવાસનો", "પ્રવાસને", "પ્રવાસ"], "I am planning a trip."),
+          listen("મારે દિલ્હી જવું છે.", "I want to go to Delhi.",
+                 ["મેં દિલ્હી જોયું.", "દિલ્હી દૂર છે.", "મારે ઘરે જવું છે."]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 16: RELATIONSHIPS & EMOTIONS ============
+  {
+    id: "u16", cefr: "B1", title: "Relationships & Emotions", icon: "💞", color: "#e07ac8",
+    description: "Friendships, feelings, conflict, apology",
+    lessons: [
+      {
+        id: "u16l1", title: "Friends & relationships",
+        exercises: [
+          mcGu("મિત્ર", "friend", ["enemy", "neighbor", "guest"]),
+          mcGu("દોસ્ત", "buddy / close friend", ["stranger", "relative", "colleague"]),
+          mcGu("દુશ્મન", "enemy", ["friend", "stranger", "ally"]),
+          mcGu("પાડોશી", "neighbor", ["relative", "friend", "stranger"]),
+          mcGu("સંબંધ", "relationship / relation", ["meeting", "agreement", "promise"]),
+          mcGu("લાગણી", "emotion / feeling", ["thought", "idea", "fact"]),
+          mcGu("વિશ્વાસ", "trust / faith", ["doubt", "fear", "hope"]),
+          mcGu("ભરોસો", "trust / reliance", ["hope", "wish", "promise"]),
+          tap("She is my best friend.",
+              ["તે", "મારી", "સૌથી", "સારી", "મિત્ર", "છે."], ["નથી", "દુશ્મન"]),
+          typeIt("I trust you.", "મને તારા પર વિશ્વાસ છે.", ["મને તમારા પર વિશ્વાસ છે."]),
+          listen("આપણે વર્ષોથી મિત્રો છીએ.", "We have been friends for years.",
+                 ["અમે કાલે મળ્યા.", "તે મારો દુશ્મન છે.", "આપણે અલગ થયા."]),
+          mcGu("સાથી", "companion / partner", ["enemy", "boss", "child"]),
+        ],
+      },
+      {
+        id: "u16l2", title: "Conflict & disagreement",
+        exercises: [
+          mcGu("ઝઘડો", "fight / quarrel", ["peace", "meeting", "talk"]),
+          mcGu("ગુસ્સો", "anger", ["happiness", "fear", "sorrow"]),
+          mcGu("તકરાર", "argument / dispute", ["agreement", "discussion", "talk"]),
+          mcGu("ગેરસમજ", "misunderstanding", ["agreement", "memory", "wish"]),
+          mcGu("ભૂલ", "mistake / error", ["right", "lie", "truth"]),
+          fill("મારી __ થઈ ગઈ.", "ભૂલ", ["ઘર", "પુસ્તક", "મીઠું"], "I made a mistake."),
+          tap("I don't want to fight with you.",
+              ["મારે", "તારી", "સાથે", "ઝઘડો", "નથી", "કરવો."], ["કરવો", "છે"]),
+          tap("This is just a misunderstanding.",
+              ["આ", "ફક્ત", "ગેરસમજ", "છે."], ["નથી", "ભૂલ"]),
+          typeIt("Don't be angry with me.", "મારા પર ગુસ્સો ન કરો.", ["મારા પર ગુસ્સે ન થાઓ."]),
+          listen("આપણે વાત કરીને ઉકેલીએ.", "Let's resolve it by talking.",
+                 ["ચાલો જઈએ.", "મને ભૂખ લાગી છે.", "આવજો, મિત્ર."]),
+        ],
+      },
+      {
+        id: "u16l3", title: "Apology & reconciliation",
+        exercises: [
+          mcGu("માફ કરો", "forgive / sorry", ["thank you", "please", "hello"]),
+          mcGu("ક્ષમા", "forgiveness", ["regret", "anger", "request"]),
+          mcGu("પસ્તાવો", "regret / remorse", ["happiness", "anger", "pride"]),
+          mcGu("ભૂલ સ્વીકારવી", "to admit a mistake", ["to blame others", "to forget", "to hide"]),
+          tap("I am very sorry, please forgive me.",
+              ["મને", "બહુ", "દુઃખ", "છે,", "મને", "માફ", "કરો."], ["નથી", "આભાર"]),
+          tap("Let's leave the past behind.",
+              ["ભૂતકાળ", "છોડી", "દઈએ."], ["ભવિષ્ય", "આવનાર"]),
+          typeIt("It was my fault.", "મારી ભૂલ હતી.", ["એ મારી ભૂલ હતી."]),
+          fill("હું __ કરું છું.", "પસ્તાવો", ["ગુસ્સો", "આનંદ", "મજાક"], "I feel regret."),
+          listen("ચાલો, ફરી મિત્રો બનીએ.", "Let's be friends again.",
+                 ["આપણે દુશ્મન છીએ.", "ચાલો, ઘરે જઈએ.", "મને ગુસ્સો છે."]),
+          mcGu("મેળ-મિલાપ", "reconciliation", ["separation", "argument", "trust"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 17: CULTURE & FESTIVALS ============
+  {
+    id: "u17", cefr: "B1", title: "Culture & Festivals", icon: "🪔", color: "#e0b53c",
+    description: "Festivals, religion, customs",
+    lessons: [
+      {
+        id: "u17l1", title: "Major festivals",
+        exercises: [
+          mcGu("દિવાળી", "Diwali (festival of lights)", ["Holi", "Navratri", "Eid"]),
+          mcGu("હોળી", "Holi (festival of colors)", ["Diwali", "Raksha Bandhan", "Eid"]),
+          mcGu("નવરાત્રિ", "Navratri (nine nights)", ["Diwali", "Holi", "Onam"]),
+          mcGu("ઉત્તરાયણ", "Uttarayan (kite festival)", ["Diwali", "Holi", "Janmashtami"]),
+          mcGu("રક્ષાબંધન", "Raksha Bandhan", ["Diwali", "Navratri", "Holi"]),
+          mcGu("તહેવાર", "festival", ["ceremony", "ritual", "fair"]),
+          mcGu("ઉત્સવ", "celebration / festival", ["meeting", "ritual", "fast"]),
+          tap("We celebrate Diwali every year.",
+              ["અમે", "દર", "વર્ષે", "દિવાળી", "ઉજવીએ", "છીએ."], ["ઉજવ્યું", "નથી"]),
+          tap("Holi is the festival of colors.",
+              ["હોળી", "રંગોનો", "તહેવાર", "છે."], ["નથી", "ઊંચો"]),
+          typeIt("Happy Diwali!", "દિવાળી મુબારક!", ["શુભ દિવાળી!"]),
+          listen("આ વર્ષે દિવાળી ક્યારે છે?", "When is Diwali this year?",
+                 ["દિવાળી મુબારક!", "મારી માતા આવી.", "મને ભૂખ લાગી."]),
+          mcGu("ઉજવણી", "celebration", ["ceremony", "feast", "ritual"]),
+        ],
+      },
+      {
+        id: "u17l2", title: "Religion & rituals",
+        exercises: [
+          mcGu("ધર્મ", "religion / dharma", ["culture", "belief", "ritual"]),
+          mcGu("મંદિર", "temple", ["mosque", "church", "shrine"]),
+          mcGu("મસ્જિદ", "mosque", ["temple", "church", "monastery"]),
+          mcGu("ચર્ચ", "church", ["temple", "mosque", "shrine"]),
+          mcGu("પ્રાર્થના", "prayer", ["meditation", "ritual", "offering"]),
+          mcGu("પૂજા", "worship / puja", ["prayer", "festival", "ritual"]),
+          mcGu("પુજારી", "priest (Hindu)", ["monk", "saint", "guru"]),
+          mcGu("ઉપવાસ", "fast (religious)", ["feast", "prayer", "vow"]),
+          fill("લોકો __ માં પ્રાર્થના કરે છે.", "મંદિર", ["ઘર", "બજાર", "બગીચો"], "People pray in the temple."),
+          tap("My grandmother fasts every Monday.",
+              ["મારી", "દાદી", "દર", "સોમવારે", "ઉપવાસ", "કરે", "છે."], ["નથી", "ખાય"]),
+          typeIt("We are going to the temple.", "અમે મંદિરે જઈએ છીએ.", ["અમે મંદિર જઈએ છીએ."]),
+          listen("આજે પૂજા છે.", "There's a puja today.",
+                 ["આજે રજા છે.", "આજે મિટિંગ છે.", "આજે ઉપવાસ છે."]),
+        ],
+      },
+      {
+        id: "u17l3", title: "Customs & traditions",
+        exercises: [
+          mcGu("રિવાજ", "custom / tradition", ["habit", "rule", "law"]),
+          mcGu("પરંપરા", "tradition / legacy", ["custom", "ritual", "history"]),
+          mcGu("સંસ્કૃતિ", "culture", ["civilization", "society", "religion"]),
+          mcGu("લગ્ન", "marriage / wedding", ["engagement", "anniversary", "birthday"]),
+          mcGu("મહેમાન", "guest", ["host", "stranger", "visitor"]),
+          tap("Guests are like gods in our culture.",
+              ["અમારી", "સંસ્કૃતિમાં", "મહેમાન", "ભગવાન", "સમાન", "છે."], ["નથી", "દુશ્મન"]),
+          tap("This is an ancient tradition.",
+              ["આ", "એક", "પ્રાચીન", "પરંપરા", "છે."], ["નથી", "નવી"]),
+          typeIt("Indian culture is very old.", "ભારતીય સંસ્કૃતિ ખૂબ જૂની છે.", ["ભારતની સંસ્કૃતિ ખૂબ જૂની છે."]),
+          fill("__ ભારતનું ગૌરવ છે.", "સંસ્કૃતિ", ["ઘર", "બાળક", "ભોજન"], "Culture is the pride of India."),
+          listen("આ ગુજરાતની પરંપરા છે.", "This is a tradition of Gujarat.",
+                 ["આ રસ્તો સારો છે.", "આ બાળકનું નામ છે.", "આ મારું ઘર છે."]),
+          mcGu("આદર", "respect / reverence", ["love", "fear", "duty"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 18: NEWS & SOCIETY ============
+  {
+    id: "u18", cefr: "B1/B2", title: "News & Society", icon: "📰", color: "#5a6c8a",
+    description: "Government, politics, social issues",
+    lessons: [
+      {
+        id: "u18l1", title: "Government & politics",
+        exercises: [
+          mcGu("સરકાર", "government", ["party", "law", "court"]),
+          mcGu("રાજકારણ", "politics", ["religion", "economics", "history"]),
+          mcGu("ચૂંટણી", "election", ["meeting", "rally", "vote"]),
+          mcGu("મતદાન", "voting / casting a vote", ["counting", "campaigning", "result"]),
+          mcGu("નેતા", "leader", ["follower", "minister", "voter"]),
+          mcGu("મંત્રી", "minister", ["leader", "officer", "judge"]),
+          mcGu("પક્ષ", "(political) party / side", ["group", "team", "religion"]),
+          mcGu("સંસદ", "parliament", ["court", "assembly", "embassy"]),
+          mcGu("કાયદો", "law", ["rule", "order", "treaty"]),
+          tap("Every citizen should vote.",
+              ["દરેક", "નાગરિકે", "મતદાન", "કરવું", "જોઈએ."], ["નહીં", "આપવું"]),
+          typeIt("Politics is complicated.", "રાજકારણ જટિલ છે.", ["રાજકારણ અઘરું છે."]),
+          listen("ચૂંટણી આવતા મહિને છે.", "The election is next month.",
+                 ["ચૂંટણી થઈ ગઈ.", "મંત્રી આવ્યા.", "સરકાર બદલાઈ."]),
+        ],
+      },
+      {
+        id: "u18l2", title: "News & media",
+        exercises: [
+          mcGu("સમાચાર", "news", ["story", "report", "rumor"]),
+          mcGu("અખબાર", "newspaper", ["magazine", "book", "letter"]),
+          mcGu("ટેલિવિઝન", "television / TV", ["radio", "computer", "screen"]),
+          mcGu("ઘોષણા", "announcement / declaration", ["rumor", "statement", "promise"]),
+          mcGu("રિપોર્ટ", "report", ["story", "article", "interview"]),
+          mcGu("તાજેતરમાં", "recently / lately", ["earlier", "long ago", "today"]),
+          tap("I read the news every morning.",
+              ["હું", "દરરોજ", "સવારે", "સમાચાર", "વાંચું", "છું."], ["નથી", "વાંચ્યું"]),
+          tap("This news is very important.",
+              ["આ", "સમાચાર", "ખૂબ", "મહત્વના", "છે."], ["નથી", "નાના"]),
+          typeIt("I saw it on the news.", "મેં તે સમાચારમાં જોયું.", ["મેં તે ટીવી પર જોયું."]),
+          fill("__ માં લખ્યું છે.", "અખબાર", ["પુસ્તક", "ઘર", "બાળક"], "It's written in the newspaper."),
+          listen("તાજેતરમાં મોટી ઘટના બની.", "A big event happened recently.",
+                 ["કાલે વરસાદ પડ્યો.", "ઘરમાં મહેમાન છે.", "મારી તબિયત સારી છે."]),
+        ],
+      },
+      {
+        id: "u18l3", title: "Social issues",
+        exercises: [
+          mcGu("સમસ્યા", "problem / issue", ["solution", "challenge", "task"]),
+          mcGu("ઉકેલ", "solution", ["problem", "answer", "question"]),
+          mcGu("ગરીબી", "poverty", ["wealth", "luxury", "comfort"]),
+          mcGu("શિક્ષણ", "education", ["literacy", "school", "knowledge"]),
+          mcGu("આરોગ્ય", "health (public)", ["medicine", "disease", "doctor"]),
+          mcGu("પર્યાવરણ", "environment", ["nature", "world", "weather"]),
+          mcGu("પ્રદૂષણ", "pollution", ["dirt", "noise", "smoke"]),
+          tap("Education is everyone's right.",
+              ["શિક્ષણ", "દરેકનો", "અધિકાર", "છે."], ["નથી", "ફરજ"]),
+          tap("We must protect the environment.",
+              ["આપણે", "પર્યાવરણનું", "રક્ષણ", "કરવું", "જોઈએ."], ["નહીં", "નુકસાન"]),
+          typeIt("Poverty is a big problem.", "ગરીબી મોટી સમસ્યા છે.", ["ગરીબી એક મોટી સમસ્યા છે."]),
+          listen("આ સમસ્યાનો ઉકેલ શોધવો જોઈએ.", "We should find a solution to this problem.",
+                 ["આ સારું છે.", "ચાલો જઈએ.", "મને ગમે છે."]),
+          mcGu("સમાજ", "society", ["nation", "country", "world"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 19: TECHNOLOGY & MODERN LIFE ============
+  {
+    id: "u19", cefr: "B1/B2", title: "Technology", icon: "💻", color: "#43d4a0",
+    description: "Tech, internet, modern problems",
+    lessons: [
+      {
+        id: "u19l1", title: "Devices & internet",
+        exercises: [
+          mcGu("મોબાઈલ", "mobile / cellphone", ["TV", "radio", "camera"]),
+          mcGu("કમ્પ્યુટર", "computer", ["mobile", "TV", "screen"]),
+          mcGu("ઈન્ટરનેટ", "internet", ["network", "phone", "TV"]),
+          mcGu("ઈમેલ", "email", ["letter", "message", "call"]),
+          mcGu("વેબસાઈટ", "website", ["app", "browser", "page"]),
+          mcGu("એપ", "app", ["website", "program", "tool"]),
+          mcGu("પાસવર્ડ", "password", ["username", "PIN", "code"]),
+          mcGu("ડેટા", "data", ["info", "file", "byte"]),
+          tap("I checked my email yesterday.",
+              ["મેં", "ગઈકાલે", "મારો", "ઈમેલ", "જોયો."], ["નહોતો", "આજે"]),
+          tap("This app is very useful.",
+              ["આ", "એપ", "ખૂબ", "ઉપયોગી", "છે."], ["નકામી", "નથી"]),
+          typeIt("Send me an email.", "મને ઈમેલ મોકલો.", ["મને એક ઈમેલ મોકલો."]),
+          listen("ઈન્ટરનેટ ધીમું છે.", "The internet is slow.",
+                 ["ઈન્ટરનેટ ઝડપી છે.", "મોબાઈલ બંધ છે.", "ડેટા પૂરો થયો."]),
+        ],
+      },
+      {
+        id: "u19l2", title: "Social media & messaging",
+        exercises: [
+          mcGu("સોશિયલ મીડિયા", "social media", ["news", "TV", "radio"]),
+          mcGu("મેસેજ", "message", ["call", "letter", "post"]),
+          mcGu("ફોટો", "photo", ["video", "image", "post"]),
+          mcGu("વિડિયો", "video", ["photo", "film", "audio"]),
+          mcGu("શેર કરવું", "to share", ["to delete", "to send", "to post"]),
+          mcGu("લાઈક", "like (social media)", ["comment", "share", "follow"]),
+          mcGu("ફોલો કરવું", "to follow (someone)", ["to block", "to comment", "to share"]),
+          tap("She posts photos every day.",
+              ["તે", "દરરોજ", "ફોટા", "પોસ્ટ", "કરે", "છે."], ["નથી", "મેસેજ"]),
+          tap("Send me the video later.",
+              ["પછી", "મને", "વિડિયો", "મોકલજો."], ["પહેલા", "આપજો"]),
+          typeIt("I sent you a message.", "મેં તને મેસેજ મોકલ્યો.", ["મેં તમને મેસેજ મોકલ્યો."]),
+          fill("હું તને ફોટો __ કરું છું.", "શેર", ["લાઈક", "ડિલીટ", "જોડ"], "I'm sharing the photo with you."),
+          listen("મેં તને મેસેજ કર્યો છે.", "I have sent you a message.",
+                 ["મેં તને બોલાવ્યો.", "મેં ફોન કર્યો.", "મેં ફોટો જોયો."]),
+        ],
+      },
+      {
+        id: "u19l3", title: "Modern challenges",
+        exercises: [
+          mcGu("ટેક્નોલોજી", "technology", ["science", "engineering", "machine"]),
+          mcGu("કૃત્રિમ બુદ્ધિ", "artificial intelligence", ["computer", "robot", "algorithm"]),
+          mcGu("રોબોટ", "robot", ["machine", "AI", "device"]),
+          mcGu("સાયબર સુરક્ષા", "cybersecurity", ["online safety", "privacy", "encryption"]),
+          mcGu("વ્યસન", "addiction", ["habit", "hobby", "interest"]),
+          mcGu("એકાંત", "loneliness / solitude", ["company", "crowd", "noise"]),
+          tap("Children spend too much time on phones.",
+              ["બાળકો", "મોબાઈલ", "પર", "બહુ", "સમય", "વિતાવે", "છે."], ["નથી", "ઓછો"]),
+          tap("AI is changing the world.",
+              ["કૃત્રિમ", "બુદ્ધિ", "દુનિયા", "બદલી", "રહી", "છે."], ["નથી", "છોડી"]),
+          typeIt("Technology is useful but dangerous.", "ટેક્નોલોજી ઉપયોગી છે પણ ખતરનાક છે.", ["ટેક્નોલોજી ઉપયોગી છે પણ જોખમી છે."]),
+          listen("મારે ડિજિટલ ડિટોક્સ કરવો છે.", "I want to do a digital detox.",
+                 ["મારે ફોન જોઈએ.", "મારે ઘરે જવું.", "મારે રજા જોઈએ."]),
+          mcGu("ડિજિટલ", "digital", ["analog", "manual", "physical"]),
+        ],
+      },
+    ],
+  },
+
+  // ============ UNIT 20: ADVANCED GRAMMAR ============
+  {
+    id: "u20", cefr: "B1/B2", title: "Advanced Grammar", icon: "📚", color: "#9c3ce0",
+    description: "Passive, causative, reported speech, subjunctive",
+    lessons: [
+      {
+        id: "u20l1", title: "Passive voice",
+        exercises: [
+          mcGu("આ ઘર બનાવાય છે.", "This house is being built.", ["He builds this house.", "I build this house.", "This house was built."]),
+          mcGu("પુસ્તક વંચાય છે.", "The book is being read.", ["I read the book.", "The book is read by me.", "He reads the book."]),
+          mcGu("રોટલી બનાવાઈ.", "The roti was made.", ["I made roti.", "She makes roti.", "Roti will be made."]),
+          fill("આ ગીત __ છે.", "ગવાય", ["ગાય", "ગાશે", "ગાવાનું"], "This song is sung."),
+          fill("આ વાર્તા __ હતી.", "કહેવાઈ", ["કહી", "કહેશે", "કહેવાય"], "This story was told."),
+          tap("This work will be done tomorrow.",
+              ["આ", "કામ", "કાલે", "કરવામાં", "આવશે."], ["કરશે", "નહીં"]),
+          typeIt("The letter has been written.", "પત્ર લખાયો છે.", ["પત્ર લખવામાં આવ્યો છે."]),
+          mcGu("ખવાય", "is eaten (passive)", ["eats", "will eat", "ate"]),
+          listen("આ વસ્તુ ખવાય નહીં.", "This thing cannot/should not be eaten.",
+                 ["આ ખાવો.", "આ સારું છે.", "ખાવાનું મજાનું."]),
+        ],
+      },
+      {
+        id: "u20l2", title: "Causative verbs (-આવ-)",
+        exercises: [
+          mcGu("બનાવવું", "to make / cause to be made", ["to be made", "to break", "to fix"]),
+          mcGu("કરાવવું", "to get (someone to) do", ["to do", "to undo", "to redo"]),
+          mcGu("ખવડાવવું", "to feed (cause to eat)", ["to eat", "to swallow", "to chew"]),
+          mcGu("પીવડાવવું", "to give to drink", ["to drink", "to pour", "to spill"]),
+          mcGu("શીખવવું", "to teach (cause to learn)", ["to learn", "to study", "to memorize"]),
+          tap("Mother feeds the child.",
+              ["માતા", "બાળકને", "ખવડાવે", "છે."], ["ખાય", "ખવડાવ્યું"]),
+          tap("She had me write the letter.",
+              ["તેણીએ", "મારી", "પાસે", "પત્ર", "લખાવ્યો."], ["લખ્યો", "લખશે"]),
+          typeIt("He taught me Gujarati.", "તેણે મને ગુજરાતી શીખવ્યું.", ["તેણે મને ગુજરાતી શીખવાડ્યું."]),
+          fill("મારી માતા મને ભોજન __ છે.", "ખવડાવે", ["ખાય", "ખવડાવ્યું", "ખવડાવશે"], "My mother feeds me."),
+          mcGu("મંગાવવું", "to order / cause to bring", ["to bring", "to send", "to order"]),
+        ],
+      },
+      {
+        id: "u20l3", title: "Reported speech",
+        exercises: [
+          mcGu("તેણે કહ્યું કે...", "he said that...", ["he asked if...", "he wanted...", "he was..."]),
+          mcGu("મેં પૂછ્યું કે...", "I asked that/if...", ["I told that...", "I said that...", "I wanted..."]),
+          tap("She said that she is coming.",
+              ["તેણીએ", "કહ્યું", "કે", "તે", "આવે", "છે."], ["નથી", "ગયા"]),
+          tap("He told me that he will come tomorrow.",
+              ["તેણે", "મને", "કહ્યું", "કે", "તે", "કાલે", "આવશે."], ["નથી", "આવ્યો"]),
+          typeIt("She said she likes me.", "તેણીએ કહ્યું કે તેને હું ગમું છું.", ["તેણીએ કહ્યું કે મને હું ગમું છું."]),
+          mcGu("તેણે પૂછ્યું", "he asked", ["he said", "he replied", "he laughed"]),
+          mcGu("મેં જવાબ આપ્યો", "I answered / I replied", ["I asked", "I told", "I said"]),
+          listen("તેણે કહ્યું કે મોડું થશે.", "He said that it will be late.",
+                 ["તે મોડો આવ્યો.", "મેં મોડું કહ્યું.", "મોડું થયું."]),
+          fill("તેણીએ __ કે તે ખુશ છે.", "કહ્યું", ["પૂછ્યું", "ચાલ્યું", "ભાગ્યું"], "She said that she is happy."),
+        ],
+      },
+      {
+        id: "u20l4", title: "Wishes & subjunctive",
+        exercises: [
+          mcGu("કાશ", "if only / I wish", ["maybe", "perhaps", "definitely"]),
+          mcGu("હોત તો સારું હતું", "would have been nice", ["would not have been", "was not", "is not"]),
+          mcGu("જો હું હોત", "if I were", ["if I am", "if I will be", "if I was"]),
+          tap("I wish you had come.",
+              ["કાશ", "તું", "આવ્યો", "હોત."], ["નથી", "આવશે"]),
+          tap("If I had time, I would go.",
+              ["જો", "મારી", "પાસે", "સમય", "હોત,", "તો", "હું", "જાત."], ["નહીં", "જઈશ"]),
+          typeIt("If only I had known.", "કાશ મને ખબર હોત.", ["કાશ મને જાણ હોત."]),
+          fill("__ હું ધનવાન હોત!", "કાશ", ["જો", "પણ", "તો"], "I wish I were rich!"),
+          mcGu("ઈચ્છા", "wish / desire", ["hope", "need", "promise"]),
+          listen("કાશ આ સ્વપ્ન સાચું થાય.", "I wish this dream comes true.",
+                 ["સ્વપ્ન જોયું.", "ઊંઘ આવી.", "વાર્તા સારી હતી."]),
+          mcGu("ક્યારેક...તો સારું", "sometimes... would be nice", ["never", "always", "rarely"]),
+        ],
+      },
+    ],
+  },
+
+];
+
+// ===== B2 Reference vocabulary (for self-study expansion) =====
+// Topical lists you can graduate to after finishing the units above.
+const B2_REFERENCE = {
+  politics_society: [
+    { gu: "સરકાર", en: "government" },
+    { gu: "ચૂંટણી", en: "election" },
+    { gu: "મતદાન", en: "voting" },
+    { gu: "સંસદ", en: "parliament" },
+    { gu: "નાગરિક", en: "citizen" },
+    { gu: "અધિકાર", en: "right (entitlement)" },
+    { gu: "ફરજ", en: "duty" },
+    { gu: "કાયદો", en: "law" },
+  ],
+  emotions_abstract: [
+    { gu: "આત્મવિશ્વાસ", en: "self-confidence" },
+    { gu: "નિરાશા", en: "disappointment" },
+    { gu: "ગૌરવ", en: "pride" },
+    { gu: "ઈર્ષ્યા", en: "envy/jealousy" },
+    { gu: "કરુણા", en: "compassion" },
+    { gu: "ઉત્સાહ", en: "enthusiasm" },
+    { gu: "ધીરજ", en: "patience" },
+  ],
+  business_economy: [
+    { gu: "વ્યવસાય", en: "business" },
+    { gu: "અર્થતંત્ર", en: "economy" },
+    { gu: "મૂડી", en: "capital (money)" },
+    { gu: "નફો", en: "profit" },
+    { gu: "નુકસાન", en: "loss" },
+    { gu: "બજેટ", en: "budget" },
+    { gu: "રોકાણ", en: "investment" },
+  ],
+  environment: [
+    { gu: "પર્યાવરણ", en: "environment" },
+    { gu: "પ્રદૂષણ", en: "pollution" },
+    { gu: "જળવાયુ પરિવર્તન", en: "climate change" },
+    { gu: "ઊર્જા", en: "energy" },
+    { gu: "પુનઃપ્રાપ્ય", en: "renewable" },
+  ],
+  technology: [
+    { gu: "ટેક્નોલોજી", en: "technology" },
+    { gu: "કમ્પ્યુટર", en: "computer" },
+    { gu: "ઇન્ટરનેટ", en: "internet" },
+    { gu: "કૃત્રિમ બુદ્ધિ", en: "artificial intelligence" },
+    { gu: "સોફ્ટવેર", en: "software" },
+  ],
+};
