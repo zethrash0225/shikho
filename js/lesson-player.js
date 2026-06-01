@@ -6,15 +6,88 @@ const LessonPlayer = {
   state: null,
 
   start(container, unit, lesson) {
+    const exercises = LessonPlayer.maybeAugmentReverse(lesson.exercises);
     LessonPlayer.state = {
       container, unit, lesson,
-      exercises: [...lesson.exercises],
+      exercises,
       index: 0,
       correctCount: 0,
       wrongCount: 0,
       requeue: [], // wrong exercises to retry at end
     };
     LessonPlayer.renderCurrent();
+  },
+
+  // Interleave reverse-direction production exercises after each recognition
+  // exercise (mcGu / listen). Toggleable via Settings → reverseMode.
+  maybeAugmentReverse(originals) {
+    const s = Storage.load();
+    if (s.reverseMode === false) return [...originals];
+
+    // Collect a pool of Gujarati items from the lesson to use as distractors
+    const guPool = [];
+    for (const ex of originals) {
+      if (ex.gu) guPool.push(ex.gu);
+      if (ex.expected) guPool.push(ex.expected);
+      if (ex.pairs) for (const p of ex.pairs) guPool.push(p.gu);
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function reverseFor(ex) {
+      // Don't reverse anything that already has _reverse set, or non-vocab types
+      if (ex._reverse) return null;
+      if (!ex.gu || !ex.en) return null;
+
+      const tokens = ex.gu.split(/\s+/).filter(Boolean);
+
+      // Multi-word: build a tap exercise (en prompt, tap gu word tiles in order)
+      if (tokens.length >= 2) {
+        const otherTokens = guPool
+          .filter(g => g !== ex.gu)
+          .flatMap(g => g.split(/\s+/))
+          .filter(w => w && !tokens.includes(w));
+        const distractors = shuffle(otherTokens).slice(0, Math.min(3, Math.max(1, otherTokens.length)));
+        return {
+          type: "tap",
+          en: ex.en,
+          gu: ex.gu,
+          tokens,
+          bank: shuffle([...tokens, ...distractors]),
+          _reverse: true,
+        };
+      }
+
+      // Single-word: build an mcEn (en prompt, pick gu from 4 options)
+      const others = guPool.filter(g => g !== ex.gu && g.split(/\s+/).length === 1);
+      const distractors = shuffle(others).slice(0, 3);
+      if (distractors.length < 1) return null;
+      return {
+        type: "mcEn",
+        en: ex.en,
+        gu: ex.gu,
+        choices: shuffle([ex.gu, ...distractors]).slice(0, 4),
+        _reverse: true,
+      };
+    }
+
+    const out = [];
+    for (const ex of originals) {
+      out.push(ex);
+      // Generate reverse for recognition-only types
+      if (ex.type === "mcGu" || ex.type === "listen") {
+        const rev = reverseFor(ex);
+        if (rev) out.push(rev);
+      }
+    }
+    return out;
   },
 
   renderCurrent() {
@@ -132,10 +205,11 @@ const LessonPlayer = {
   handlers: {
 
     mcGu(stage, ex) {
-      stage.innerHTML = `
-        <div class="lp-prompt">What does this mean?</div>
-        <div class="lp-gu-large">${ex.gu}</div>
-      `;
+      stage.innerHTML = `<div class="lp-prompt">What does this mean? <span class="lp-hint-tip">(tap any underlined word for a hint)</span></div>`;
+      const guDiv = document.createElement("div");
+      guDiv.className = "lp-gu-large";
+      guDiv.appendChild(GuDict.renderHintable(ex.gu));
+      stage.appendChild(guDiv);
       const speak = speakButton(ex.gu);
       speak.style.margin = "0 auto 16px";
       stage.appendChild(speak);
@@ -367,9 +441,24 @@ const LessonPlayer = {
     },
 
     fill(stage, ex) {
-      stage.innerHTML = `<div class="lp-prompt">Fill in the blank</div>
-        <div class="lp-gu-large">${ex.template.replace("__", '<span class="lp-blank">_____</span>')}</div>
-        <div class="lp-en-small">${ex.en || ""}</div>`;
+      stage.innerHTML = `<div class="lp-prompt">Fill in the blank <span class="lp-hint-tip">(tap any underlined word for a hint)</span></div>`;
+      const guDiv = document.createElement("div");
+      guDiv.className = "lp-gu-large";
+      const parts = ex.template.split("__");
+      for (let i = 0; i < parts.length; i++) {
+        if (parts[i]) guDiv.appendChild(GuDict.renderHintable(parts[i]));
+        if (i < parts.length - 1) {
+          const blank = document.createElement("span");
+          blank.className = "lp-blank";
+          blank.textContent = "_____";
+          guDiv.appendChild(blank);
+        }
+      }
+      stage.appendChild(guDiv);
+      const enSmall = document.createElement("div");
+      enSmall.className = "lp-en-small";
+      enSmall.textContent = ex.en || "";
+      stage.appendChild(enSmall);
 
       const choices = document.createElement("div");
       choices.className = "lp-choices";

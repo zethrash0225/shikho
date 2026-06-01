@@ -3,6 +3,7 @@ const VIEWS = {
   home: PathView,
   alphabet: AlphabetView,
   stories: StoriesView,
+  review: ReviewView,
   conversation: ConversationView,
   settings: SettingsView,
 };
@@ -38,8 +39,53 @@ function updateTopbar() {
   }
 }
 
+// Apply saved theme to <html> so dark mode kicks in before first paint
+function applyTheme() {
+  const s = Storage.load();
+  document.documentElement.setAttribute("data-theme", s.theme || "auto");
+  // Update topbar icon if it exists
+  const btn = document.getElementById("theme-toggle");
+  if (btn) btn.textContent = currentlyDark() ? "☀️" : "🌙";
+}
+
+// Returns whether the app is currently rendering in dark mode (resolving "auto" via OS pref)
+function currentlyDark() {
+  const t = document.documentElement.getAttribute("data-theme");
+  if (t === "dark") return true;
+  if (t === "light") return false;
+  // auto
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function toggleTheme() {
+  const s = Storage.load();
+  // Toggle to the explicit opposite of what's currently showing
+  s.theme = currentlyDark() ? "light" : "dark";
+  Storage.save(s);
+  applyTheme();
+}
+
+// Run as early as possible (deferred scripts run after DOM ready, but this still beats render)
+applyTheme();
+
+// Capture install prompt for "Install as web app" button. Browsers fire
+// beforeinstallprompt exactly once; we stash it so Settings can trigger it later.
+window.__installPrompt = null;
+window.__isInstalled = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  window.__installPrompt = e;
+  document.dispatchEvent(new CustomEvent("install-available"));
+});
+window.addEventListener("appinstalled", () => {
+  window.__installPrompt = null;
+  window.__isInstalled = true;
+  document.dispatchEvent(new CustomEvent("install-state-changed"));
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   Speech.init();
+  applyTheme();
 
   // Register the service worker for offline / install support.
   // Only registers if served over http(s); skipped on file:// to avoid noise.
@@ -50,6 +96,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => switchView(tab.dataset.view));
   });
+
+  // Wire up the topbar dark-mode toggle
+  const themeBtn = document.getElementById("theme-toggle");
+  if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
 
   updateTopbar();
   switchView("home");

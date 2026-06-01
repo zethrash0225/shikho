@@ -1337,6 +1337,112 @@ const UNITS = [
     ],
   },
 
+  // ============ UNIT 21: NUMBERS, TIME & DATES ============
+  // 11-99 are essentially all irregular in Gujarati — no compositional shortcut.
+  // Native learners memorize them individually as kids. This unit closes that gap.
+  {
+    id: "u21", cefr: "A2", title: "Numbers, Time & Dates", icon: "🔢", color: "#37a3ff",
+    description: "11-99 irregulars, telling time, days, months",
+    lessons: [
+      {
+        id: "u21l1", title: "Numbers 11-30",
+        exercises: [
+          mcGu("અગિયાર", "11", ["10", "12", "13"]),
+          mcGu("બાર", "12", ["10", "11", "14"]),
+          mcGu("તેર", "13", ["12", "14", "15"]),
+          mcGu("ચૌદ", "14", ["13", "15", "16"]),
+          mcGu("પંદર", "15", ["14", "16", "20"]),
+          mcGu("સોળ", "16", ["15", "17", "18"]),
+          mcGu("સત્તર", "17", ["16", "18", "19"]),
+          mcGu("અઢાર", "18", ["17", "19", "20"]),
+          mcGu("ઓગણીસ", "19", ["18", "20", "29"]),
+          mcGu("વીસ", "20", ["10", "12", "30"]),
+          mcGu("એકવીસ", "21", ["20", "22", "11"]),
+          mcGu("બાવીસ", "22", ["20", "12", "32"]),
+          mcGu("પચ્ચીસ", "25", ["35", "45", "55"]),
+          mcGu("ત્રીસ", "30", ["13", "20", "40"]),
+          listen("પંદર", "15", ["પાંચ", "પચાસ", "વીસ"]),
+          listen("ઓગણીસ", "19", ["નવ", "નવ્વાણું", "ઓગણત્રીસ"]),
+          match([
+            { gu: "અગિયાર", en: "11" },{ gu: "પંદર", en: "15" },
+            { gu: "વીસ", en: "20" },{ gu: "પચ્ચીસ", en: "25" },
+            { gu: "ત્રીસ", en: "30" },{ gu: "બાર", en: "12" },
+          ]),
+          mcGu("ઓગણત્રીસ", "29", ["19", "39", "22"]),
+          tap("There are eleven students in the class.",
+              ["વર્ગમાં", "અગિયાર", "વિદ્યાર્થીઓ", "છે."], ["પાંચ", "નથી"]),
+        ],
+      },
+      {
+        id: "u21l2", title: "Numbers 31-99",
+        exercises: [
+          mcGu("ચાલીસ", "40", ["14", "30", "50"]),
+          mcGu("પચાસ", "50", ["15", "40", "60"]),
+          mcGu("સાઈઠ", "60", ["16", "50", "70"]),
+          mcGu("સિત્તેર", "70", ["17", "60", "80"]),
+          mcGu("એંસી", "80", ["18", "70", "90"]),
+          mcGu("નેવું", "90", ["19", "80", "100"]),
+          mcGu("એકતાલીસ", "41", ["31", "51", "14"]),
+          mcGu("બેતાલીસ", "42", ["32", "52", "24"]),
+          mcGu("પંચાવન", "55", ["45", "65", "15"]),
+          mcGu("છપ્પન", "56", ["46", "66", "26"]),
+          mcGu("પાંસઠ", "65", ["55", "75", "25"]),
+          mcGu("પંચોતેર", "75", ["65", "85", "35"]),
+          mcGu("ચોર્યાસી", "84", ["74", "94", "44"]),
+          mcGu("નવ્વાણું", "99", ["89", "9", "19"]),
+          mcGu("સો", "100", ["90", "1000", "50"]),
+          listen("પચાસ", "50", ["પંચાસ", "પચાવન", "પાંચ"]),
+          listen("નવ્વાણું", "99", ["નવ", "નેવું", "નવાસી"]),
+          match([
+            { gu: "ચાલીસ", en: "40" },{ gu: "પચાસ", en: "50" },
+            { gu: "સાઈઠ", en: "60" },{ gu: "સિત્તેર", en: "70" },
+            { gu: "એંસી", en: "80" },{ gu: "નેવું", en: "90" },
+          ]),
+          mcGu("એક્યાસી", "81", ["71", "91", "18"]),
+          tap("My grandmother is eighty-five years old.",
+              ["મારી", "દાદી", "પંચાસી", "વર્ષની", "છે."], ["નથી", "મોટી"]),
+        ],
+      },
+      {
+        id: "u21l3", title: "Telling time, days & months",
+        exercises: [
+          mcGu("એક વાગ્યો", "it's one o'clock", ["it's two o'clock", "one minute", "one hour"]),
+          mcGu("ત્રણ વાગ્યા", "it's three o'clock", ["it's thirteen", "three days", "third one"]),
+          mcGu("સાડા પાંચ", "half past five", ["quarter past five", "five-thirty (alt)", "five o'clock"]),
+          mcGu("સવા છ", "quarter past six", ["quarter to six", "half past six", "six o'clock"]),
+          mcGu("પોણા આઠ", "quarter to eight", ["quarter past eight", "half past eight", "eight o'clock"]),
+          mcGu("મિનિટ", "minute", ["hour", "second", "moment"]),
+          mcGu("કલાક", "hour", ["minute", "second", "day"]),
+          // Days
+          mcGu("સોમવાર", "Monday", ["Sunday", "Tuesday", "Wednesday"]),
+          mcGu("મંગળવાર", "Tuesday", ["Monday", "Wednesday", "Thursday"]),
+          mcGu("બુધવાર", "Wednesday", ["Tuesday", "Thursday", "Friday"]),
+          mcGu("ગુરુવાર", "Thursday", ["Wednesday", "Friday", "Saturday"]),
+          mcGu("શુક્રવાર", "Friday", ["Thursday", "Saturday", "Sunday"]),
+          mcGu("શનિવાર", "Saturday", ["Friday", "Sunday", "Monday"]),
+          mcGu("રવિવાર", "Sunday", ["Saturday", "Monday", "Tuesday"]),
+          // Months (Gregorian, commonly used)
+          mcGu("જાન્યુઆરી", "January", ["June", "July", "August"]),
+          mcGu("ઓગસ્ટ", "August", ["April", "October", "September"]),
+          mcGu("ડિસેમ્બર", "December", ["November", "October", "September"]),
+          // Time questions
+          mcGu("કેટલા વાગ્યા?", "what time is it?", ["how many?", "how long?", "what day?"]),
+          tap("It's half past seven now.",
+              ["હમણાં", "સાડા", "સાત", "વાગ્યા", "છે."], ["નથી", "પોણા"]),
+          tap("I'll meet you on Sunday.",
+              ["હું", "તને", "રવિવારે", "મળીશ."], ["શનિવાર", "નહીં"]),
+          typeIt("Today is Monday.", "આજે સોમવાર છે.", ["આજે સોમવારે છે."]),
+          listen("સાડા આઠ", "half past eight", ["પોણા આઠ", "આઠ વાગ્યા", "નવ વાગ્યા"]),
+          match([
+            { gu: "સોમવાર", en: "Monday" },{ gu: "બુધવાર", en: "Wednesday" },
+            { gu: "શુક્રવાર", en: "Friday" },{ gu: "રવિવાર", en: "Sunday" },
+            { gu: "કલાક", en: "hour" },{ gu: "મિનિટ", en: "minute" },
+          ]),
+        ],
+      },
+    ],
+  },
+
 ];
 
 // ===== B2 Reference vocabulary (for self-study expansion) =====

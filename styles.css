@@ -16,6 +16,40 @@
   --radius: 14px;
 }
 
+/* Dark theme — applied when [data-theme="dark"] is on <html>, or via auto + OS preference */
+:root[data-theme="dark"] {
+  --bg: #14110e;
+  --surface: #1f1a16;
+  --surface-2: #29231d;
+  --ink: #f0eae0;
+  --ink-soft: #b4ada3;
+  --ink-muted: #807a72;
+  --accent: #f0894a;
+  --accent-deep: #d06a2c;
+  --accent-soft: #3a2818;
+  --good: #58c581;
+  --bad: #e0625a;
+  --border: #3a342d;
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg: #14110e;
+    --surface: #1f1a16;
+    --surface-2: #29231d;
+    --ink: #f0eae0;
+    --ink-soft: #b4ada3;
+    --ink-muted: #807a72;
+    --accent: #f0894a;
+    --accent-deep: #d06a2c;
+    --accent-soft: #3a2818;
+    --good: #58c581;
+    --bad: #e0625a;
+    --border: #3a342d;
+    --shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+}
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -827,6 +861,21 @@ main {
   font-weight: 600; font-size: 13px;
 }
 
+.theme-toggle {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-grid; place-items: center;
+  transition: all 0.15s;
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
 /* ----- Path (skill tree) ----- */
 .path-status {
   display: grid;
@@ -982,6 +1031,15 @@ main {
 .lp-prompt {
   font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em;
   color: var(--ink-muted); margin-bottom: 16px;
+}
+.lp-hint-tip {
+  display: inline-block;
+  margin-left: 6px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
+  color: var(--accent-deep);
+  opacity: 0.85;
 }
 .lp-gu-large {
   font-family: 'Noto Sans Gujarati', sans-serif;
@@ -1328,6 +1386,159 @@ main {
   border-radius: 10px;
   font-size: 13px;
 }
+
+/* ===== Review tab ===== */
+.review-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.review-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+}
+.review-stat .num {
+  font-size: 22px; font-weight: 700; color: var(--accent-deep);
+}
+.review-stat .lbl {
+  font-size: 11px; color: var(--ink-muted);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;
+}
+
+.review-controls-bar {
+  display: flex; gap: 12px; align-items: center;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+}
+.review-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--bg);
+}
+.review-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--ink-soft); cursor: pointer;
+}
+
+.review-group {
+  margin-bottom: 24px;
+}
+.review-group-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin: 0 0 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.review-group-count {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+.review-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.12s;
+  position: relative;
+}
+.review-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.review-card .rc-gu {
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.review-card .rc-en {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.35;
+  transition: filter 0.2s;
+}
+.review-card .rc-actions {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0.55;
+}
+.review-card.blurred .rc-en {
+  filter: blur(5px);
+  user-select: none;
+}
+
+/* ===== Personal SRS deck (Review tab) ===== */
+.review-deck-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  color: white;
+  padding: 18px 22px;
+  border-radius: 14px;
+  margin-bottom: 22px;
+}
+.review-deck-card h3 { margin: 0 0 4px; font-size: 18px; }
+.review-deck-card p { margin: 0; color: rgba(255, 255, 255, 0.92); font-size: 13px; }
+.review-deck-card .deck-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.review-deck-card .btn-primary {
+  background: white; color: var(--accent-deep); border-color: white;
+}
+.review-deck-card .btn-primary:hover { background: var(--accent-soft); }
+.review-deck-card .btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+/* Hint tooltip actions */
+.gu-hint-tooltip .hint-actions {
+  display: flex; gap: 6px; margin-top: 4px;
+}
+.gu-hint-tooltip .hint-save {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.gu-hint-tooltip .hint-save:hover { background: rgba(255, 255, 255, 0.3); }
+
+/* Install button in Settings */
+.install-section .install-btn {
+  background: var(--accent); color: white; border-color: var(--accent);
+}
+.install-section .install-btn:disabled { opacity: 0.5; cursor: default; }
 
 /* ===== Toast ===== */
 .toast {

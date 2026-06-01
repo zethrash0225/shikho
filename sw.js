@@ -1,7 +1,7 @@
 // Service worker — cache the app shell so it works offline once installed.
 // Bump CACHE_VERSION whenever you change app files.
 
-const CACHE_VERSION = "shikho-v2";
+const CACHE_VERSION = "shikho-v10";
 
 const SHELL = [
   "./",
@@ -25,6 +25,7 @@ const SHELL = [
   "./js/path.js",
   "./js/alphabet.js",
   "./js/stories.js",
+  "./js/review.js",
   "./js/conversation.js",
   "./js/settings.js",
   "./js/app.js",

@@ -111,12 +111,27 @@ const GuDict = (() => {
     dismissHint();
     const tip = document.createElement("div");
     tip.className = "gu-hint-tooltip";
+    const saved = Storage.inDeck(word);
     tip.innerHTML = `
       <div class="hint-gu">${word}</div>
       <div class="hint-en">${gloss}</div>
-      <button class="hint-speak">🔊</button>
+      <div class="hint-actions">
+        <button class="hint-speak">🔊 Hear</button>
+        <button class="hint-save">${saved ? "✓ Saved" : "+ Save"}</button>
+      </div>
     `;
     document.body.appendChild(tip);
+    tip.querySelector(".hint-save").addEventListener("click", (e) => {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      if (Storage.inDeck(word)) {
+        Storage.removeFromDeck(word);
+        btn.textContent = "+ Save";
+      } else {
+        Storage.saveToDeck(word, gloss);
+        btn.textContent = "✓ Saved";
+      }
+    });
     const r = anchor.getBoundingClientRect();
     const tr = tip.getBoundingClientRect();
     let left = r.left + r.width / 2 - tr.width / 2;

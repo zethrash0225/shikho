@@ -47,10 +47,15 @@ const Storage = {
       totalReviews: 0,
       correctReviews: 0,
 
+      // Personal SRS deck — user-saved words for daily review
+      personalSrs: {},
+
       // Settings
       preferredVoiceURI: null,
       apiKey: "",
       showTransliteration: true,
+      theme: "auto",            // "auto" | "light" | "dark"
+      reverseMode: true,         // auto-generate production exercises in lessons
     };
   },
 
@@ -165,5 +170,64 @@ const Storage = {
       else if (entry.due <= now) due.push(c);
     }
     return [...due, ...fresh].slice(0, max);
+  },
+
+  // ---- Personal SRS deck (words the user has saved from hints / review) ----
+  saveToDeck(gu, en) {
+    if (!gu) return;
+    const state = Storage.load();
+    state.personalSrs = state.personalSrs || {};
+    if (!state.personalSrs[gu]) {
+      state.personalSrs[gu] = { gu, en, ease: 2.5, interval: 0, due: Date.now(), reps: 0 };
+      Storage.save(state);
+    }
+    return state.personalSrs[gu];
+  },
+
+  removeFromDeck(gu) {
+    const state = Storage.load();
+    if (state.personalSrs && state.personalSrs[gu]) {
+      delete state.personalSrs[gu];
+      Storage.save(state);
+    }
+  },
+
+  inDeck(gu) {
+    const state = Storage.load();
+    return !!(state.personalSrs && state.personalSrs[gu]);
+  },
+
+  // SM-2 grade: 0=again, 1=hard, 2=good, 3=easy
+  gradeDeckCard(gu, quality) {
+    const state = Storage.load();
+    const card = state.personalSrs && state.personalSrs[gu];
+    if (!card) return;
+    const now = Date.now();
+    if (quality === 0) {
+      card.reps = 0; card.interval = 0;
+      card.ease = Math.max(1.3, card.ease - 0.2);
+    } else {
+      card.reps += 1;
+      if (card.reps === 1) card.interval = quality === 3 ? 3 : 1;
+      else if (card.reps === 2) card.interval = quality === 3 ? 6 : 3;
+      else card.interval = Math.round(card.interval * card.ease * (quality === 1 ? 0.7 : quality === 3 ? 1.3 : 1.0));
+      if (quality === 1) card.ease = Math.max(1.3, card.ease - 0.15);
+      else if (quality === 3) card.ease += 0.1;
+    }
+    card.due = now + card.interval * 86400000;
+    Storage.save(state);
+    return card;
+  },
+
+  getDueDeckCards(max = 50) {
+    const state = Storage.load();
+    if (!state.personalSrs) return [];
+    const now = Date.now();
+    return Object.values(state.personalSrs).filter(c => c.due <= now).slice(0, max);
+  },
+
+  deckSize() {
+    const state = Storage.load();
+    return Object.keys(state.personalSrs || {}).length;
   },
 };
