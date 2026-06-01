@@ -407,6 +407,467 @@ const STORIES = [
     ],
   },
 
+  // ===== A2: simple description =====
+  {
+    id: "s9",
+    cefr: "A2",
+    title: "બગીચામાં એક દિવસ",
+    titleEn: "A day in the garden",
+    text: [
+      "આજે રવિવાર છે અને હવામાન સારું છે.",
+      "મારી નાની બહેન અને હું બગીચામાં ફરવા ગયા.",
+      "ત્યાં ઘણા બાળકો રમતા હતા.",
+      "મારી બહેન સાયકલ ચલાવી રહી હતી.",
+      "મેં ફૂલો જોયા અને થોડા ફોટા લીધા.",
+      "પાછળથી અમે આઈસ્ક્રીમ ખાધી.",
+      "આ દિવસ ખૂબ સારો રહ્યો.",
+    ],
+    translations: [
+      "Today is Sunday and the weather is nice.",
+      "My little sister and I went to the garden for a walk.",
+      "Many children were playing there.",
+      "My sister was riding a bicycle.",
+      "I saw flowers and took a few photos.",
+      "Later we ate ice cream.",
+      "This day was very good.",
+    ],
+    gloss: [
+      { gu: "બગીચામાં", en: "in the garden" },
+      { gu: "ફરવા", en: "to walk / stroll" },
+      { gu: "ચલાવી રહી હતી", en: "was riding (continuous)" },
+      { gu: "પાછળથી", en: "later / afterwards" },
+      { gu: "ફૂલો", en: "flowers" },
+    ],
+    questions: [
+      {
+        q: "What day of the week is it?",
+        choices: ["Sunday", "Monday", "Friday", "Saturday"],
+        correct: "Sunday",
+      },
+      {
+        q: "Who went to the garden?",
+        choices: ["The narrator and his little sister", "The whole family", "Just the narrator", "The narrator's friends"],
+        correct: "The narrator and his little sister",
+      },
+      {
+        q: "What was the sister doing?",
+        choices: ["Riding a bicycle", "Eating ice cream", "Taking photos", "Reading"],
+        correct: "Riding a bicycle",
+      },
+      {
+        q: "What did they eat?",
+        choices: ["Ice cream", "Roti", "Vegetables", "Fruit"],
+        correct: "Ice cream",
+      },
+    ],
+  },
+
+  // ===== A2/B1: school memory =====
+  {
+    id: "s10",
+    cefr: "A2/B1",
+    title: "મારી શાળાનો અનુભવ",
+    titleEn: "My school experience",
+    text: [
+      "જ્યારે હું નાનો હતો, ત્યારે હું ગુજરાતી માધ્યમની શાળામાં ભણતો હતો.",
+      "મારી શાળા ઘરથી નજીક હતી, એટલે હું પગે ચાલીને જતો.",
+      "મારા પ્રિય શિક્ષક માધવ સાહેબ હતા.",
+      "તેઓ ગણિત શીખવતા હતા અને ખૂબ ધીરજવાન હતા.",
+      "દર શનિવારે અમે રમતગમત રમતા હતા.",
+      "મારા સહપાઠીઓ આજે પણ મારા સારા મિત્રો છે.",
+      "એ દિવસો યાદ આવે છે, ત્યારે મન ભારે થઈ જાય છે.",
+    ],
+    translations: [
+      "When I was small, I used to study at a Gujarati-medium school.",
+      "My school was close to home, so I would walk on foot.",
+      "My favorite teacher was Madhav Sir.",
+      "He taught mathematics and was very patient.",
+      "Every Saturday we used to play games.",
+      "My classmates are still my good friends today.",
+      "When I remember those days, my heart grows heavy.",
+    ],
+    gloss: [
+      { gu: "માધ્યમ", en: "medium (of instruction)" },
+      { gu: "ભણતો હતો", en: "used to study (habitual past)" },
+      { gu: "પગે ચાલીને", en: "on foot" },
+      { gu: "ધીરજવાન", en: "patient" },
+      { gu: "સહપાઠીઓ", en: "classmates" },
+      { gu: "મન ભારે થઈ જાય છે", en: "the heart grows heavy" },
+    ],
+    questions: [
+      {
+        q: "What medium of instruction was the narrator's school?",
+        choices: ["Gujarati", "English", "Hindi", "Marathi"],
+        correct: "Gujarati",
+      },
+      {
+        q: "How did the narrator get to school?",
+        choices: ["On foot", "By bicycle", "By bus", "By car"],
+        correct: "On foot",
+      },
+      {
+        q: "What did Madhav Sir teach?",
+        choices: ["Mathematics", "Gujarati", "Science", "History"],
+        correct: "Mathematics",
+      },
+      {
+        q: "What does 'મન ભારે થઈ જાય છે' suggest?",
+        choices: ["Nostalgia / sadness", "Excitement", "Anger", "Confusion"],
+        correct: "Nostalgia / sadness",
+      },
+    ],
+  },
+
+  // ===== B1: cuisine =====
+  {
+    id: "s11",
+    cefr: "B1",
+    title: "ગુજરાતી ભોજનની ખાસિયત",
+    titleEn: "The specialty of Gujarati cuisine",
+    text: [
+      "ગુજરાતી ભોજન તેના વૈવિધ્ય માટે પ્રખ્યાત છે.",
+      "એક પૂર્ણ થાળીમાં દાળ, ભાત, રોટલી, શાક અને છાસ હોય છે.",
+      "ઘણી વખત મીઠાશનો સ્પર્શ પણ ઉમેરવામાં આવે છે — જેમ કે ગોળ.",
+      "ઢોકળા, થેપલા, ખાંડવી — આ બધી લોકપ્રિય વાનગીઓ છે.",
+      "દરેક ઘરમાં મસાલા થોડા-થોડા અલગ હોય છે, એટલે દરેક ઘરનો સ્વાદ પણ અલગ હોય છે.",
+      "ગુજરાતી લોકો માટે ભોજન ફક્ત પેટ ભરવા માટે નથી — એ પ્રેમ વ્યક્ત કરવાનું એક માધ્યમ છે.",
+    ],
+    translations: [
+      "Gujarati cuisine is famous for its variety.",
+      "A complete thali contains dal, rice, roti, vegetables, and buttermilk.",
+      "Often a touch of sweetness is also added — like jaggery.",
+      "Dhokla, thepla, khandvi — all these are popular dishes.",
+      "In every household the spices are slightly different, so the taste of every home is different too.",
+      "For Gujarati people, food is not just to fill the stomach — it is a medium of expressing love.",
+    ],
+    gloss: [
+      { gu: "વૈવિધ્ય", en: "variety / diversity" },
+      { gu: "પ્રખ્યાત", en: "famous" },
+      { gu: "છાસ", en: "buttermilk" },
+      { gu: "મીઠાશ", en: "sweetness" },
+      { gu: "ઉમેરવામાં આવે છે", en: "is added (passive)" },
+      { gu: "ગોળ", en: "jaggery" },
+      { gu: "વાનગીઓ", en: "dishes / preparations" },
+      { gu: "માધ્યમ", en: "medium / means" },
+    ],
+    questions: [
+      {
+        q: "What is Gujarati cuisine famous for?",
+        choices: ["Its variety", "Being spicy", "Being only sweet", "Being simple"],
+        correct: "Its variety",
+      },
+      {
+        q: "What sweetener is mentioned as being added?",
+        choices: ["Jaggery (ગોળ)", "Honey", "Sugar only", "Dates"],
+        correct: "Jaggery (ગોળ)",
+      },
+      {
+        q: "Why does each household's food taste different?",
+        choices: ["Spices differ slightly", "Recipes are secret", "Ingredients vary regionally", "Cooking equipment differs"],
+        correct: "Spices differ slightly",
+      },
+      {
+        q: "What deeper meaning does food have for Gujaratis, per the text?",
+        choices: ["A way of expressing love", "A duty", "Just nutrition", "A religious offering"],
+        correct: "A way of expressing love",
+      },
+    ],
+  },
+
+  // ===== B1: travel anecdote =====
+  {
+    id: "s12",
+    cefr: "B1",
+    title: "ટ્રેન ચૂકી ગયો",
+    titleEn: "I missed the train",
+    text: [
+      "ગયા અઠવાડિયે મારે અમદાવાદથી મુંબઈ જવાનું હતું.",
+      "મારી ટ્રેન સવારે છ વાગ્યે હતી, પણ હું મોડો ઊઠ્યો.",
+      "જ્યારે હું સ્ટેશન પહોંચ્યો, ત્યારે ટ્રેન ઊપડી ગઈ હતી.",
+      "મેં તરત જ બીજી ટિકિટ ખરીદી, પણ આગલી ટ્રેન ત્રણ કલાક પછી હતી.",
+      "મેં સ્ટેશન પાસેની ચાની દુકાનમાં બેસીને રાહ જોઈ.",
+      "ત્યાં મારી મુલાકાત એક રસપ્રદ વૃદ્ધ સાથે થઈ.",
+      "તેમણે મને જૂના મુંબઈની વાર્તાઓ સંભળાવી.",
+      "ટ્રેન ચૂક્યાનો અફસોસ થયો, પણ એ મુલાકાત યાદગાર બની.",
+    ],
+    translations: [
+      "Last week I had to go from Ahmedabad to Mumbai.",
+      "My train was at six in the morning, but I woke up late.",
+      "By the time I reached the station, the train had already departed.",
+      "I immediately bought another ticket, but the next train was three hours later.",
+      "I sat at a tea stall near the station and waited.",
+      "There I met an interesting old man.",
+      "He told me stories of old Mumbai.",
+      "I regretted missing the train, but that meeting became memorable.",
+    ],
+    gloss: [
+      { gu: "ચૂકી ગયો", en: "missed (perfective)" },
+      { gu: "ઊપડી ગઈ હતી", en: "had already departed" },
+      { gu: "તરત જ", en: "immediately" },
+      { gu: "આગલી", en: "the next" },
+      { gu: "રાહ જોઈ", en: "waited / kept watch" },
+      { gu: "મુલાકાત", en: "meeting / encounter" },
+      { gu: "વૃદ્ધ", en: "old man / elder" },
+      { gu: "અફસોસ", en: "regret" },
+      { gu: "યાદગાર", en: "memorable" },
+    ],
+    questions: [
+      {
+        q: "Why did the narrator miss the train?",
+        choices: ["He woke up late", "Traffic", "His car broke down", "The train left early"],
+        correct: "He woke up late",
+      },
+      {
+        q: "How long did the narrator have to wait for the next train?",
+        choices: ["Three hours", "One hour", "Six hours", "All day"],
+        correct: "Three hours",
+      },
+      {
+        q: "Where did he wait?",
+        choices: ["A tea stall near the station", "Inside the station", "A hotel", "His friend's house"],
+        correct: "A tea stall near the station",
+      },
+      {
+        q: "How does the narrator feel about the missed train by the end?",
+        choices: [
+          "He regrets it but values the encounter that followed",
+          "He's still angry",
+          "He blames the railway",
+          "He doesn't care"
+        ],
+        correct: "He regrets it but values the encounter that followed",
+      },
+    ],
+  },
+
+  // ===== B2: opinion / social =====
+  {
+    id: "s13",
+    cefr: "B2",
+    title: "શહેરી જીવનની ઝડપ",
+    titleEn: "The pace of urban life",
+    text: [
+      "આજે મોટા શહેરોમાં લોકો સતત દોડતા રહે છે.",
+      "સવારથી રાત સુધી — કામ, ટ્રાફિક, ફોન, મિટિંગ — બધું એક પછી એક.",
+      "આપણે પોતાની સાથે બેસવાનો સમય જ ભૂલી ગયા છીએ.",
+      "ગાડી ચાલતી હોય, પણ મન ચાલતું નથી.",
+      "આ ઝડપમાં આપણે શું ગુમાવી રહ્યા છીએ?",
+      "મારા મતે, સંબંધો, સ્વાસ્થ્ય અને શાંતિ — આ ત્રણ વસ્તુઓની કિંમત ઘટતી જાય છે.",
+      "કદાચ સમય આવી ગયો છે કે આપણે થોડું ધીમું થઈએ.",
+      "ધીમું થવું એ આળસ નથી — તે જીવનને ફરી અનુભવવાનું એક માર્ગ છે.",
+    ],
+    translations: [
+      "In big cities today, people keep running constantly.",
+      "From morning till night — work, traffic, phone, meetings — everything one after another.",
+      "We have forgotten the very time to sit with ourselves.",
+      "The vehicle moves, but the mind doesn't.",
+      "What are we losing in this speed?",
+      "In my opinion, relationships, health, and peace — the value of these three things keeps diminishing.",
+      "Perhaps the time has come for us to slow down a bit.",
+      "Slowing down is not laziness — it is a way to experience life again.",
+    ],
+    gloss: [
+      { gu: "સતત", en: "constantly" },
+      { gu: "દોડતા રહે છે", en: "keep running" },
+      { gu: "ભૂલી ગયા છીએ", en: "have forgotten" },
+      { gu: "ગુમાવી રહ્યા છીએ", en: "are losing" },
+      { gu: "કિંમત", en: "value / price" },
+      { gu: "ઘટતી જાય છે", en: "keeps decreasing" },
+      { gu: "ધીમું થઈએ", en: "let us slow down" },
+      { gu: "આળસ", en: "laziness" },
+      { gu: "ફરી", en: "again" },
+    ],
+    questions: [
+      {
+        q: "What is the narrator's main concern about urban life?",
+        choices: [
+          "We rush so much that we lose touch with what matters",
+          "Cities are too crowded",
+          "Traffic is bad",
+          "Phones are addictive"
+        ],
+        correct: "We rush so much that we lose touch with what matters",
+      },
+      {
+        q: "Which three things does the narrator say we're devaluing?",
+        choices: [
+          "Relationships, health, peace",
+          "Money, fame, power",
+          "Family, religion, tradition",
+          "Education, work, ambition"
+        ],
+        correct: "Relationships, health, peace",
+      },
+      {
+        q: "How does the narrator define slowing down?",
+        choices: [
+          "A way to experience life again, not laziness",
+          "Avoiding responsibility",
+          "Doing nothing",
+          "Retiring early"
+        ],
+        correct: "A way to experience life again, not laziness",
+      },
+      {
+        q: "What grammar feature appears in 'ઘટતી જાય છે'?",
+        choices: [
+          "Continuous/progressive aspect",
+          "Past tense",
+          "Passive voice",
+          "Subjunctive"
+        ],
+        correct: "Continuous/progressive aspect",
+      },
+    ],
+  },
+
+  // ===== B2: folktale =====
+  {
+    id: "s14",
+    cefr: "B2",
+    title: "બે મિત્રો અને રીંછ",
+    titleEn: "Two friends and the bear",
+    text: [
+      "એક વખત બે મિત્રો જંગલમાંથી પસાર થઈ રહ્યા હતા.",
+      "અચાનક તેમની સામે એક મોટું રીંછ આવી ગયું.",
+      "પહેલો મિત્ર ઝડપથી એક ઝાડ પર ચડી ગયો.",
+      "બીજો મિત્ર, જેને ચડતાં આવડતું ન હતું, જમીન પર સૂઈ ગયો અને શ્વાસ રોકી દીધો.",
+      "રીંછ તેની પાસે આવ્યું, સૂંઘ્યું અને — મરેલા સમજીને — જતું રહ્યું.",
+      "પાછળથી પહેલા મિત્રે પૂછ્યું, 'રીંછે તારા કાનમાં શું કહ્યું?'",
+      "બીજાએ ગંભીરતાથી જવાબ આપ્યો, 'એણે કહ્યું — જે મિત્ર સંકટ સમયે છોડી જાય, તે સાચો મિત્ર નથી.'",
+      "આ વાર્તાનો સાર સ્પષ્ટ છે: સાચા મિત્રો મુશ્કેલીમાં જ ઓળખાય છે.",
+    ],
+    translations: [
+      "Once two friends were passing through a forest.",
+      "Suddenly a big bear came in front of them.",
+      "The first friend quickly climbed up a tree.",
+      "The second friend, who didn't know how to climb, lay down on the ground and held his breath.",
+      "The bear came near him, sniffed, and — thinking him dead — went away.",
+      "Afterwards the first friend asked, 'What did the bear say in your ear?'",
+      "The second answered seriously, 'It said — the friend who leaves you in times of trouble is not a true friend.'",
+      "The moral of this story is clear: true friends are recognized only in difficulty.",
+    ],
+    gloss: [
+      { gu: "પસાર થઈ રહ્યા હતા", en: "were passing (continuous past)" },
+      { gu: "અચાનક", en: "suddenly" },
+      { gu: "રીંછ", en: "bear" },
+      { gu: "ચડી ગયો", en: "climbed up (perfective)" },
+      { gu: "શ્વાસ રોકી દીધો", en: "held the breath" },
+      { gu: "મરેલા સમજીને", en: "thinking (him) dead" },
+      { gu: "સંકટ", en: "trouble / calamity" },
+      { gu: "સાર", en: "essence / moral" },
+      { gu: "મુશ્કેલીમાં", en: "in difficulty" },
+      { gu: "ઓળખાય છે", en: "are recognized (passive)" },
+    ],
+    questions: [
+      {
+        q: "What did the first friend do when the bear appeared?",
+        choices: ["Climbed a tree", "Hid in a bush", "Ran away", "Fought the bear"],
+        correct: "Climbed a tree",
+      },
+      {
+        q: "Why did the bear leave the second friend alone?",
+        choices: [
+          "It thought he was dead",
+          "It wasn't hungry",
+          "It heard a noise",
+          "Another animal scared it"
+        ],
+        correct: "It thought he was dead",
+      },
+      {
+        q: "What was the 'bear's message' meant to convey?",
+        choices: [
+          "A friend who abandons you in trouble isn't a real friend",
+          "Bears are wise",
+          "Climbing trees is bad",
+          "Never travel through forests"
+        ],
+        correct: "A friend who abandons you in trouble isn't a real friend",
+      },
+      {
+        q: "What is the moral of the story?",
+        choices: [
+          "True friends are recognized in difficulty",
+          "Always carry a weapon",
+          "Lie down when scared",
+          "Bears can talk"
+        ],
+        correct: "True friends are recognized in difficulty",
+      },
+    ],
+  },
+
+  // ===== B2: formal letter =====
+  {
+    id: "s15",
+    cefr: "B2",
+    title: "મેનેજરને પત્ર",
+    titleEn: "Letter to the manager",
+    text: [
+      "આદરણીય શ્રીમાન,",
+      "વિષય: રજાની અરજી",
+      "આપને જણાવવાનું કે હું ગયા સપ્તાહથી તાવ અને ઉધરસથી પીડાઉં છું.",
+      "ડૉક્ટરની સલાહ મુજબ, મારે ઓછામાં ઓછા ત્રણ દિવસ આરામ કરવો જરૂરી છે.",
+      "તેથી, હું વિનંતી કરું છું કે મને 3 થી 5 તારીખ સુધી રજા આપવામાં આવે.",
+      "મારી જવાબદારીઓ રામભાઈને સોંપી દીધી છે, જેથી કામમાં વિક્ષેપ ન પડે.",
+      "આપની સંમતિની અપેક્ષાએ,",
+      "આભાર સહિત,",
+      "મહેશ પટેલ",
+    ],
+    translations: [
+      "Respected Sir,",
+      "Subject: Leave application",
+      "I would like to inform you that I have been suffering from fever and cough since last week.",
+      "On the doctor's advice, I need to rest for at least three days.",
+      "Therefore, I request that I be granted leave from the 3rd to the 5th.",
+      "I have handed over my responsibilities to Rambhai, so that work is not disrupted.",
+      "Awaiting your approval,",
+      "With thanks,",
+      "Mahesh Patel",
+    ],
+    gloss: [
+      { gu: "આદરણીય", en: "respected (formal address)" },
+      { gu: "વિષય", en: "subject (of a letter)" },
+      { gu: "પીડાઉં છું", en: "I am suffering" },
+      { gu: "સલાહ મુજબ", en: "as per the advice" },
+      { gu: "ઓછામાં ઓછા", en: "at least" },
+      { gu: "વિનંતી", en: "request" },
+      { gu: "આપવામાં આવે", en: "be given (passive subjunctive)" },
+      { gu: "જવાબદારીઓ", en: "responsibilities" },
+      { gu: "વિક્ષેપ", en: "interruption / disturbance" },
+      { gu: "સંમતિ", en: "approval / consent" },
+      { gu: "અપેક્ષાએ", en: "in anticipation of" },
+    ],
+    questions: [
+      {
+        q: "Why is the writer requesting leave?",
+        choices: ["Illness (fever and cough)", "Vacation", "Family event", "A wedding"],
+        correct: "Illness (fever and cough)",
+      },
+      {
+        q: "How many days of leave are requested?",
+        choices: ["3 days (the 3rd to the 5th)", "1 day", "A week", "Half a day"],
+        correct: "3 days (the 3rd to the 5th)",
+      },
+      {
+        q: "Who will cover the writer's responsibilities?",
+        choices: ["Rambhai", "The manager", "No one", "The whole team"],
+        correct: "Rambhai",
+      },
+      {
+        q: "Which feature marks this as a formal letter?",
+        choices: [
+          "Use of આદરણીય and formal closings",
+          "Use of slang",
+          "Use of emojis",
+          "Casual greeting"
+        ],
+        correct: "Use of આદરણીય and formal closings",
+      },
+    ],
+  },
+
   // ===== B2: literary / reflective =====
   {
     id: "s8",

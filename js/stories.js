@@ -62,14 +62,31 @@ const StoriesView = {
     for (let i = 0; i < story.text.length; i++) {
       const para = document.createElement("div");
       para.className = "story-sentence";
-      para.innerHTML = `
-        <button class="speak-btn">🔊</button>
-        <div class="story-gu gu">${story.text[i]}</div>
-        <div class="story-en">${story.translations[i]}</div>
-      `;
-      para.querySelector(".speak-btn").addEventListener("click", () => Speech.speak(story.text[i]));
+
+      // Shadow toolbar: 🔊 + 🎤 + ▶
+      const tools = Shadow.makeToolbar(story.text[i], `${story.id}_s${i}`);
+      tools.classList.add("story-tools");
+      para.appendChild(tools);
+
+      // Hintable Gujarati line
+      const guLine = document.createElement("div");
+      guLine.className = "story-gu gu";
+      guLine.appendChild(GuDict.renderHintable(story.text[i]));
+      para.appendChild(guLine);
+
+      // English line
+      const enLine = document.createElement("div");
+      enLine.className = "story-en";
+      enLine.textContent = story.translations[i];
+      para.appendChild(enLine);
+
       body.appendChild(para);
     }
+
+    const hintNote = document.createElement("p");
+    hintNote.className = "story-hint-note";
+    hintNote.innerHTML = `<strong>Tip:</strong> tap any underlined Gujarati word for its meaning. Tap 🎤 to record yourself, then ▶ to play back and compare. Recordings stay only in this browser session.`;
+    body.appendChild(hintNote);
 
     // Vocab gloss
     if (story.gloss && story.gloss.length) {

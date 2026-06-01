@@ -1179,11 +1179,11 @@ main {
 }
 .story-body { padding: 18px 22px; }
 .story-sentence {
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 1px dashed var(--border);
-  display: grid;
-  grid-template-columns: 36px 1fr;
-  column-gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .story-sentence:last-child { border-bottom: none; }
 .story-sentence .speak-btn {
@@ -1193,8 +1193,6 @@ main {
   border-radius: 50%;
   font-size: 14px;
   cursor: pointer;
-  grid-row: 1 / span 2;
-  align-self: start;
 }
 .story-sentence .speak-btn:hover { background: var(--accent); color: white; }
 .story-gu {
@@ -1238,6 +1236,97 @@ main {
   font-size: 12px;
   color: var(--ink-muted);
   margin-top: 2px;
+}
+
+/* ===== Shadowing controls ===== */
+.shadow-toolbar {
+  display: inline-flex; gap: 4px;
+}
+.shadow-btn {
+  width: 30px; height: 30px;
+  border: none; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent-deep);
+  font-size: 13px; cursor: pointer;
+  display: inline-grid; place-items: center;
+  transition: all 0.12s;
+}
+.shadow-btn:hover { background: var(--accent); color: white; }
+.shadow-btn.hidden { display: none; }
+.shadow-rec.is-recording {
+  background: #c0392b;
+  color: white;
+  animation: pulse 1s infinite;
+}
+.shadow-play { background: rgba(46, 139, 87, 0.15); color: var(--good); }
+.shadow-play:hover { background: var(--good); color: white; }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* ===== Word hint tooltip ===== */
+.gu-word.hintable {
+  border-bottom: 1px dotted rgba(184, 93, 36, 0.5);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.gu-word.hintable:hover {
+  background: var(--accent-soft);
+  border-radius: 3px;
+}
+.gu-hint-tooltip {
+  position: absolute;
+  z-index: 200;
+  background: var(--ink);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  max-width: 280px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  font-size: 14px;
+  animation: hintIn 0.12s;
+}
+.gu-hint-tooltip .hint-gu {
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.gu-hint-tooltip .hint-en {
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+.gu-hint-tooltip .hint-speak {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.gu-hint-tooltip .hint-speak:hover { background: rgba(255, 255, 255, 0.3); }
+@keyframes hintIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Story-specific: shadow toolbar placement in sentence grid */
+.story-sentence .story-tools {
+  grid-row: 1 / span 2;
+  align-self: start;
+  display: inline-flex;
+  flex-direction: row;
+  gap: 4px;
+}
+.story-hint-note {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  border-radius: 10px;
+  font-size: 13px;
 }
 
 /* ===== Toast ===== */

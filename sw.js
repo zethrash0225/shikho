@@ -1,7 +1,7 @@
 // Service worker — cache the app shell so it works offline once installed.
 // Bump CACHE_VERSION whenever you change app files.
 
-const CACHE_VERSION = "shikho-v1";
+const CACHE_VERSION = "shikho-v2";
 
 const SHELL = [
   "./",
@@ -13,14 +13,14 @@ const SHELL = [
   "./icons/icon-maskable-512.png",
   "./icons/apple-touch-icon.png",
   "./data/alphabet.js",
-  "./data/vocabulary.js",
-  "./data/grammar.js",
   "./data/dialogues.js",
   "./data/units.js",
   "./data/stories.js",
   "./js/storage.js",
   "./js/audio.js",
   "./js/keyboard.js",
+  "./js/shadowing.js",
+  "./js/dict.js",
   "./js/lesson-player.js",
   "./js/path.js",
   "./js/alphabet.js",
